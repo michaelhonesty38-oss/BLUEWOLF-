@@ -1,0 +1,884 @@
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Blue Wolf Control Panel</title>
+<style>
+:root { --ink:#07090f; --ink-2:#0d1220; --ink-3:#151c2e; --line:#252d42; --gold:#e3ab2f; --gold-soft:#f1d27c; --text:#ece8dc; --muted:#a0a7b8; --good:#4cc38a; --bad:#ff8585; --blue:#6a95ff; --display:"Arial Narrow", Impact, sans-serif; --body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ink); color: var(--text); font: 16px/1.5 var(--body); -webkit-text-size-adjust: 100%; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 6px; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { font-family: var(--display); text-transform: uppercase; letter-spacing: .03em; }
+h2 { font-size: 1.5rem; } h3 { font-size: 1.1rem; }
+.top { position: sticky; top: 0; z-index: 5; background: rgba(7,9,15,.96); border-bottom: 1px solid var(--line); }
+.top-in { max-width: 760px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+.top img { width: 36px; height: 36px; border-radius: 50%; }
+.top b { font-family: var(--display); letter-spacing: .08em; text-transform: uppercase; font-size: 1.2rem; white-space: nowrap; }
+.top .sp { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+@media (max-width: 560px) { .top .muted.small { display: none; } }
+.app { max-width: 760px; margin: 0 auto; padding: 16px 16px 60px; display: grid; gap: 14px; }
+.card { background: var(--ink-2); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 10px; min-width: 0; }
+.warn-t { color: #ff8a80; }
+.card.warn { border-color: #6b2b2b; } .card.hl { border-color: #5d4a1a; }
+.row { display: flex; gap: 10px; align-items: center; min-width: 0; flex-wrap: wrap; }
+.row.between { justify-content: space-between; }
+.muted { color: var(--muted); } .small { font-size: .85rem; }
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.stat { background: var(--ink-3); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.stat b { display: block; font-family: var(--display); font-size: 1.9rem; color: var(--gold); line-height: 1.1; }
+.tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+.tabs button { flex: none; min-height: 42px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--ink-2); color: var(--muted); cursor: pointer; font-weight: 600; }
+.tabs button[aria-selected="true"] { background: var(--gold); color: #17110a; border-color: var(--gold); }
+.badge { display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 6px; border-radius: 999px; background: var(--bad); color: #200; font-size: .75rem; text-align: center; }
+.btn { white-space: nowrap; min-height: 42px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--gold); background: var(--gold); color: #17110a; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.btn.ghost { background: transparent; color: var(--text); border-color: var(--line); }
+.btn.danger { background: transparent; color: var(--bad); border-color: #6b2b2b; }
+.btn.good { background: transparent; color: var(--good); border-color: #245a43; }
+.btn.armed { background: var(--bad); color: #200; border-color: var(--bad); }
+.btn[disabled] { opacity: .5; }
+input[type=text], input[type=password], input[type=email], input[type=search] { width: 100%; min-height: 46px; background: var(--ink-3); border: 1px solid var(--line); border-radius: 12px; padding: 0 14px; font-size: 16px; }
+label { display: grid; gap: 6px; font-size: .85rem; color: var(--muted); font-weight: 600; }
+.pill { font-size: .72rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.pill.ok { color: var(--good); border-color: #245a43; } .pill.bad { color: var(--bad); border-color: #6b2b2b; } .pill.gold { color: var(--gold-soft); border-color: #5d4a1a; }
+.kv { display: grid; gap: 2px; font-size: .9rem; } .kv span { color: var(--muted); }
+.pre { white-space: pre-line; overflow-wrap: anywhere; }
+.err { color: var(--bad); min-height: 1.2em; font-size: .9rem; }
+.empty { text-align: center; color: var(--muted); padding: 18px; }
+[hidden] { display: none !important; }
+.chk { display: flex; align-items: center; gap: 10px; }
+.chk input { width: 22px; height: 22px; }
+input[type=file] { width: 100%; color: var(--muted); }
+textarea { width: 100%; min-height: 70px; background: var(--ink-3); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; color: var(--text); font: inherit; }
+.logo-s { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; border: 1px solid var(--line); background: #0b1a3a; }
+</style>
+
+<header class="top"><div class="top-in"><img src="data:image/png;base64,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" alt="" width="36" height="36"><b>Blue Wolf</b><span class="muted small">Control panel</span><div class="sp"><span class="pill" id="live">Offline</span><button class="btn ghost" id="out" type="button" hidden>Log out</button></div></div></header>
+<main class="app">
+  <section id="login" class="card hl">
+    <h2>Administrator sign in</h2>
+    <p class="muted small">This page is for the Blue Wolf administrator only. Anyone else who signs in is refused by the database.</p>
+    <label for="em">Email<input type="email" id="em" autocomplete="username" maxlength="80"></label>
+    <label for="pw">Password<input type="password" id="pw" autocomplete="current-password" maxlength="80"></label>
+    <p class="err" id="lerr" role="alert"></p>
+    <button class="btn" id="go" type="button">Sign in</button>
+  </section>
+
+  <section id="panel" hidden>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div id="view" style="margin-top:14px; display:grid; gap:12px"></div>
+  </section>
+</main>
+
+<script src="config.js"></script>
+<script>window.BW_BACKEND = window.BW_BACKEND || {};</script>
+<script>
+(function () {
+  "use strict";
+  var BE = window.BW_BACKEND, DBU = String(BE.url || "").replace(/\/+$/, "");
+  var AUTHB = (BE.authBase || "https://identitytoolkit.googleapis.com").replace(/\/+$/, "");
+  var TOKB = (BE.tokenBase || "https://securetoken.googleapis.com").replace(/\/+$/, "");
+  var $ = function (id) { return document.getElementById(id); };
+  var A = null, D = { users: {}, orders: {}, reqs: {}, notes: {}, sos: {}, reps: {}, ins: false, cfg: null, pay: null, bank: null, promo: null, shops: {}, sp: {}, prods: {}, pics: {} }, tab = "overview", timer = null, idleAt = Date.now(), pending = null;
+  var search = h("input", { type: "search", id: "q", placeholder: "Search name or phone", maxlength: "40" });
+  var ordFilter = "active";
+
+  function h(tag, props) {
+    var e = document.createElement(tag);
+    if (props) Object.keys(props).forEach(function (k) {
+      var v = props[k];
+      if (k === "class") e.className = v; else if (k === "text") e.textContent = v;
+      else if (k.slice(0, 2) === "on") e.addEventListener(k.slice(2), v);
+      else if (v === true) e.setAttribute(k, ""); else if (v !== false && v != null) e.setAttribute(k, v);
+    });
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (Array.isArray(c)) c.forEach(function (x) { if (x != null && x !== false) e.append(x.nodeType ? x : document.createTextNode(String(x))); });
+      else if (c != null && c !== false) e.append(c.nodeType ? c : document.createTextNode(String(c)));
+    }
+    return e;
+  }
+  function jfetch(url, opt) {
+    return fetch(url, opt).then(function (r) { return r.text().then(function (t) { var j = null; try { j = t ? JSON.parse(t) : null; } catch (e) {} if (!r.ok) { var er = new Error("http"); er.status = r.status; er.body = j; throw er; } return j; }); });
+  }
+  function token() {
+    if (A && Date.now() < A.exp - 60000) return Promise.resolve(A.id);
+    if (!A) return Promise.reject(new Error("signed out"));
+    return jfetch(TOKB + "/v1/token?key=" + encodeURIComponent(BE.apiKey), { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: "grant_type=refresh_token&refresh_token=" + encodeURIComponent(A.refresh) })
+      .then(function (j) { A = { id: j.id_token, refresh: j.refresh_token, exp: Date.now() + (parseInt(j.expires_in, 10) || 3600) * 1000 }; return A.id; });
+  }
+  function call(path, method, body, query) {
+    return token().then(function (t) { return jfetch(DBU + path + ".json?auth=" + encodeURIComponent(t) + (query ? "&" + query : ""), { method: method || "GET", headers: { "Content-Type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body) }); });
+  }
+  function ago(ts) { if (!ts) return "-"; var m = Math.max(0, Math.round((Date.now() - ts) / 60000)); if (m < 1) return "just now"; if (m < 60) return m + " min ago"; var hr = Math.round(m / 60); if (hr < 48) return hr + " h ago"; return Math.round(hr / 24) + " d ago"; }
+  function money(n) { return "NGN " + Math.round(n || 0).toLocaleString("en-US"); }
+  function norm(s) { return String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); }
+  function nameOf(uid) { var u = D.users[uid]; return u ? u.name : "(unknown)"; }
+  function wa(phone, text) { return h("a", { class: "btn ghost", href: "https://wa.me/" + String(phone).replace(/[^0-9]/g, ""), target: "_blank", rel: "noopener" }, text || "WhatsApp"); }
+  function confirmBtn(label, cls, fn, key) {
+    var armed = pending === key;
+    return h("button", { type: "button", class: "btn " + cls + (armed ? " armed" : ""), onclick: function (ev) {
+      if (pending !== key) {
+        pending = key; clearTimeout(confirmBtn.t);
+        if (tab === "setup" && dirty) { var b = ev.currentTarget; b.classList.add("armed"); b.textContent = "Tap again to confirm"; confirmBtn.t = setTimeout(function () { pending = null; b.classList.remove("armed"); b.textContent = label; }, 4000); return; }
+        draw(); confirmBtn.t = setTimeout(function () { pending = null; draw(); }, 4000); return;
+      }
+      pending = null; fn();
+    } }, armed ? "Tap again to confirm" : label);
+  }
+  function act(p) { return p.then(refresh).catch(function (e) { $("lerr").textContent = ""; flash("That did not save (" + (e && e.status || "network") + ")."); }); }
+  function flash(t) { var el = $("live"); el.textContent = t; setTimeout(function () { el.textContent = "Live"; }, 3500); }
+
+  /* ---------- sign in ---------- */
+  if (!BE.url || !BE.apiKey) { $("lerr").textContent = "Not set up yet: config.js is missing or empty."; $("go").disabled = true; }
+  $("go").addEventListener("click", function () {
+    var em = $("em").value.trim().toLowerCase(), pw = $("pw").value; $("lerr").textContent = "";
+    if (!em || !pw) { $("lerr").textContent = "Enter your email and password."; return; }
+    $("go").disabled = true;
+    jfetch(AUTHB + "/v1/accounts:signInWithPassword?key=" + encodeURIComponent(BE.apiKey), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: em, password: pw, returnSecureToken: true }) })
+      .then(function (j) { A = { id: j.idToken, refresh: j.refreshToken, exp: Date.now() + (parseInt(j.expiresIn, 10) || 3600) * 1000 }; return call("/users", "GET"); })
+      .then(function (u) { $("pw").value = ""; D.users = u || {}; start(); })
+      .catch(function (e) { A = null; $("lerr").textContent = e && e.status === 401 ? "This account is not the administrator." : "Sign in failed. Check your email and password."; })
+      .then(function () { $("go").disabled = false; });
+  });
+  $("pw").addEventListener("keydown", function (e) { if (e.key === "Enter") $("go").click(); });
+  $("out").addEventListener("click", signOut);
+  function signOut() { A = null; D = { users: {}, orders: {}, reqs: {}, notes: {}, sos: {}, reps: {}, ins: false, cfg: null, pay: null, bank: null, promo: null, shops: {}, sp: {}, prods: {}, pics: {} }; clearTimeout(timer); $("login").hidden = false; $("panel").hidden = true; $("out").hidden = true; $("live").textContent = "Offline"; $("pw").value = ""; }
+  ["click", "keydown", "touchstart"].forEach(function (ev) { document.addEventListener(ev, function () { idleAt = Date.now(); }, { passive: true }); });
+
+  function start() { $("login").hidden = true; $("panel").hidden = false; $("out").hidden = false; idleAt = Date.now(); refresh(); }
+  function refresh() {
+    if (!A) return Promise.resolve();
+    clearTimeout(timer);
+    return Promise.all([call("/users"), call("/orders"), call("/openRequests"), call("/adminNotes"), call("/config/insurance"), call("/config/payments"), call("/connections/bank"), call("/config/promo"), tab === "shops" ?  Promise.all([call("/shops"), call("/shopsPrivate"), call("/products")]) : Promise.resolve(null), call("/config/payto"), call("/config/fares"), call("/config/zones"), call("/sos", "GET", undefined, "orderBy=%22%24key%22&limitToLast=100").catch(function () { return null; }), call("/reports", "GET", undefined, "orderBy=%22%24key%22&limitToLast=100").catch(function () { return null; }), call("/config/places").catch(function () { return null; }), call("/placeSuggestions", "GET", undefined, "orderBy=%22%24key%22&limitToLast=100").catch(function () { return null; })]).then(function (r) {
+      var keep = D;
+      D = { users: r[0] || {}, orders: r[1] || {}, reqs: r[2] || {}, notes: r[3] || {}, ins: !!(r[4] && r[4].enabled === true), cfg: r[4] || null, pay: r[5] || null, bank: r[6] || null, promo: r[7] || null, payto: r[9] || null, fares: r[10] || null, zones: r[11] || null, sos: r[12] || {}, reps: r[13] || {}, places: r[14] || null, psug: r[15] || {},
+        shops: r[8] ? (r[8][0] || {}) : keep.shops, sp: r[8] ? (r[8][1] || {}) : keep.sp, prods: r[8] ? (r[8][2] || {}) : keep.prods, pics: keep.pics };
+      if (D.bank && D.bank.accountNumber && (!D.payto || D.payto.accountNumber !== D.bank.accountNumber)) { call("/config/payto", "PUT", { bankName: D.bank.bankName || "", accountName: D.bank.accountName || "", accountNumber: D.bank.accountNumber }).catch(function () {}); }
+      $("live").textContent = "Live"; $("live").className = "pill ok"; sosWatch(); draw();
+    }).catch(function () { $("live").textContent = "Connection problem"; $("live").className = "pill bad"; })
+      .then(function () {
+        if (!A) return;
+        if (Date.now() - idleAt > 20 * 60000) { signOut(); $("lerr").textContent = "Signed out after 20 minutes without activity."; return; }
+        timer = setTimeout(function () { if (!document.hidden) refresh(); else timer = setTimeout(refresh, 8000); }, 8000);
+      });
+  }
+
+  /* ---------- data helpers ---------- */
+  function ordersArr() { return Object.keys(D.orders).map(function (k) { return Object.assign({ id: k }, D.orders[k]); }).sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); }); }
+  function usersArr() { return Object.keys(D.users).map(function (k) { return Object.assign({ uid: k }, D.users[k]); }).sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); }); }
+  function counts(uid) { var r = { rider: 0, done: 0, cancelled: 0, drove: 0 }; ordersArr().forEach(function (o) { if (o.riderId === uid) { r.rider++; if (o.status === "cancelled") r.cancelled++; } if (o.driverId === uid && o.status === "done") r.drove++; }); return r; }
+  function alerts() {
+    var out = [], now = Date.now(), os = ordersArr(), us = usersArr();
+    us.forEach(function (u) { var n = D.notes[u.uid]; if (n && n.flagged) out.push({ sev: "high", uid: u.uid, text: nameOf(u.uid) + " is flagged" + (n.note ? ": " + n.note : "") }); });
+    var byRider = {};
+    os.forEach(function (o) { (byRider[o.riderId] = byRider[o.riderId] || []).push(o); });
+    Object.keys(byRider).forEach(function (r) {
+      var l = byRider[r];
+      if (l.filter(function (o) { return o.status === "cancelled" && now - (o.updatedAt || o.createdAt) < 3600000; }).length >= 3) out.push({ sev: "high", uid: r, text: nameOf(r) + " cancelled 3 or more orders in the last hour" });
+      if (l.filter(function (o) { return now - o.createdAt < 600000; }).length >= 5) out.push({ sev: "high", uid: r, text: nameOf(r) + " placed 5 or more orders in 10 minutes" });
+    });
+    var plates = {}, lics = {};
+    us.forEach(function (u) { if (u.driver) { var p = norm(u.driver.plate), l = norm(u.driver.licence); if (p) (plates[p] = plates[p] || []).push(u.uid); if (l) (lics[l] = lics[l] || []).push(u.uid); } });
+    Object.keys(plates).forEach(function (p) { if (plates[p].length > 1) out.push({ sev: "high", uid: plates[p][0], text: "Plate " + p + " is used by " + plates[p].length + " accounts: " + plates[p].map(nameOf).join(", ") }); });
+    Object.keys(lics).forEach(function (p) { if (lics[p].length > 1) out.push({ sev: "high", uid: lics[p][0], text: "Licence number is used by " + lics[p].length + " accounts: " + lics[p].map(nameOf).join(", ") }); });
+    os.forEach(function (o) { if (o.status === "done" && o.driverId && o.km >= 1.5 && (o.updatedAt - o.createdAt) < 120000) out.push({ sev: "med", uid: o.driverId, text: "Job of " + o.km + " km finished in under 2 minutes (driver " + nameOf(o.driverId) + ")" }); });
+    us.forEach(function (u) { if (u.driverStatus === "pending" && now - u.createdAt > 86400000) out.push({ sev: "low", uid: u.uid, text: "Driver application from " + u.name + " has waited over a day" }); });
+    os.forEach(function (o) {
+      if (["accepted", "arrived", "ongoing"].indexOf(o.status) < 0) return;
+      [["driverLoc", "driverId", "Driver"], ["riderLoc", "riderId", "Customer"]].forEach(function (f) {
+        var l = o[f[0]], quiet = l && l.t ? now - l.t : now - (o.updatedAt || o.createdAt);
+        if (quiet > 240000) out.push({ sev: "med", uid: o[f[1]], text: f[2] + " " + nameOf(o[f[1]]) + " has not sent a location for " + Math.round(quiet / 60000) + " min on a " + o.status + " " + o.type + " (phone offline or out of signal). The trip is still active and the money is still held." });
+      });
+      if ((o.driverConfirmed && !o.riderConfirmed && now - (o.driverConfirmedAt || 0) > 1200000) || (o.riderConfirmed && !o.driverConfirmed && now - (o.riderConfirmedAt || 0) > 1200000))
+        out.push({ sev: "high", uid: o.riderId, text: "Only one side has confirmed the " + o.type + " for over 20 minutes (" + (o.driverConfirmed ? "driver" : "customer") + " confirmed). Open the Orders tab to check the location and resolve it." });
+    });
+    var stale = Object.keys(D.reqs).filter(function (k) { return now - (D.reqs[k].createdAt || 0) > 7200000; });
+    if (stale.length) out.push({ sev: "low", stale: stale, text: stale.length + " old open request(s) are still listed" });
+    return out;
+  }
+
+  /* ---------- views ---------- */
+  var TABS = ["overview", "safety", "drivers", "users", "orders", "shops", "setup", "alerts"], TNAMES = { overview: "Overview", safety: "Safety", drivers: "Drivers", users: "Users", orders: "Orders", shops: "Shops", setup: "Setup", alerts: "Alerts" };
+  var dirty = false;
+  /* ---------- Safety: emergency alerts, reports and the live trip monitor ---------- */
+  var seenSos = null, sosTimer = 0;
+  function sosArr() { return Object.keys(D.sos || {}).map(function (k) { return Object.assign({ id: k }, D.sos[k]); }).sort(function (a, b) { return (b.t || 0) - (a.t || 0); }); }
+  function repsArr() { return Object.keys(D.reps || {}).map(function (k) { return Object.assign({ id: k }, D.reps[k]); }).sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); }); }
+  function openSos() { return sosArr().filter(function (x) { return x.status === "open"; }); }
+  function openReps() { return repsArr().filter(function (x) { return x.status === "open"; }); }
+  function siren() {
+    try { var C = window.AudioContext || window.webkitAudioContext, c = new C(), t = c.currentTime; for (var i = 0; i < 6; i++) { var o = c.createOscillator(), g = c.createGain(); o.connect(g); g.connect(c.destination); o.type = "square"; o.frequency.value = i % 2 ? 660 : 960; g.gain.value = 0.18; o.start(t + i * 0.28); o.stop(t + i * 0.28 + 0.26); } setTimeout(function () { try { c.close(); } catch (e) {} }, 2500); } catch (e) {}
+    try { if (navigator.vibrate) navigator.vibrate([400, 150, 400, 150, 600]); } catch (e) {}
+  }
+  /* Runs after every refresh: makes a loud alert the moment a new emergency arrives, and keeps a red banner on every tab while one is open. */
+  function sosWatch() {
+    var open = openSos(), ids = open.map(function (x) { return x.id; });
+    var banner = $("sosbar");
+    if (!banner) { banner = h("div", { id: "sosbar", class: "card warn", role: "alert", style: "position:sticky;top:0;z-index:50;border-color:#c62d2d;background:#2a0f12;cursor:pointer" }); banner.addEventListener("click", function () { tab = "safety"; dirty = false; draw(); }); $("tabs").parentNode.insertBefore(banner, $("tabs")); }
+    banner.hidden = !open.length;
+    banner.textContent = "";
+    if (open.length) { banner.append(h("b", { text: "EMERGENCY: " + open.length + " open alert" + (open.length > 1 ? "s" : "") + ". Tap to open the Safety tab." })); }
+    var fresh = seenSos === null ? ids : ids.filter(function (id) { return seenSos.indexOf(id) < 0; });
+    seenSos = ids.concat(seenSos || []);
+    if (fresh.length) {
+      siren();
+      try { if (window.Notification && Notification.permission === "granted") new Notification("Blue Wolf EMERGENCY", { body: fresh.length + " new emergency alert", tag: "bw-sos", requireInteraction: true }); } catch (e) {}
+      clearInterval(sosTimer); var n = 0; sosTimer = setInterval(function () { if (!openSos().length || ++n > 8) { clearInterval(sosTimer); document.title = "Blue Wolf admin"; return; } document.title = n % 2 ? "EMERGENCY - Blue Wolf" : "Blue Wolf admin"; }, 1000);
+    }
+  }
+  function tel(num, label, cls) { return h("a", { class: "btn " + (cls || "ghost"), href: "tel:" + String(num).replace(/[^0-9+]/g, ""), text: label }); }
+  function mapLink(lat, lng, text) { return h("a", { class: "btn ghost", href: "https://www.google.com/maps?q=" + lat + "," + lng, target: "_blank", rel: "noopener", text: text || "Open location" }); }
+  function phoneOf(uid) { var u = D.users[uid]; return u && u.phone ? (String(u.phone).charAt(0) === "0" ? "+234" + String(u.phone).slice(1) : (String(u.phone).charAt(0) === "+" ? u.phone : "+" + u.phone)) : ""; }
+  function otherOf(o, uid) { return !o ? "" : (o.riderId === uid ? o.driverId : o.riderId); }
+  function repCount(uid) { return repsArr().filter(function (r) { return r.targetId === uid; }).length; }
+  var CATN = { fraud: "Fraud or money outside the app", price: "Overcharging or wrong price", unsafe: "Unsafe or felt unsafe", abuse: "Rude, threatening or inappropriate", goods: "Stolen, damaged or wrong goods", noshow: "No-show or very late", other: "Something else" };
+  function noteBox(id) { return h("input", { type: "text", id: id, placeholder: "Note for the record (optional)", maxlength: "300", autocomplete: "off", oninput: function () { dirty = true; } }); }
+  function sosCard(x) {
+    var o = D.orders[x.orderId] ? Object.assign({ id: x.orderId }, D.orders[x.orderId]) : null, me = D.users[x.uid] || {}, other = otherOf(o, x.uid), op = other ? phoneOf(other) : "";
+    var loc = x.lat != null ? [x.lat, x.lng] : null, live = o && (x.role === "driver" ? o.driverLoc : o.riderLoc);
+    if (live && live.lat && live.t > (x.t || 0)) loc = [live.lat, live.lng];
+    var open = x.status === "open", wmsg = "EMERGENCY. " + (x.name || me.name || "A Blue Wolf user") + " (" + (x.role || "") + ") needs help." + (loc ? " Location: https://www.google.com/maps?q=" + loc[0] + "," + loc[1] : "") + (o ? " Order " + codeOf(o.id) + "." : "");
+    return h("div", { class: "card " + (open ? "warn" : ""), "data-sos": x.id, style: open ? "border-color:#c62d2d" : "" },
+      h("div", { class: "row between" }, h("b", { text: (open ? "EMERGENCY" : "Handled") + ": " + (x.name || me.name || "(unknown)") + " (" + (x.role || "?") + ")" }), h("span", { class: "pill " + (open ? "bad" : "ok"), text: open ? "OPEN" : "handled" })),
+      h("p", { class: "muted small", text: "Sent " + ago(x.t) + (x.note ? ". They wrote: " + x.note : "") }),
+      o ? h("div", { class: "kv" }, h("div", null, h("span", { text: "Trip  " }), o.type + " " + o.status + ", code " + codeOf(o.id)), h("div", null, h("span", { text: "From  " }), o.pickup), h("div", null, h("span", { text: "To  " }), o.dropoff),
+        other ? h("div", null, h("span", { text: (x.role === "driver" ? "Customer  " : "Driver  ") }), nameOf(other) + (op ? "  " + op : "")) : null) : null,
+      loc ? h("p", { class: "small", text: "Location " + loc[0] + ", " + loc[1] + (live && live.t ? " (live, seen " + ago(live.t) + ")" : "") }) : h("p", { class: "small warn-t", text: "No location came with this alert. Call them now." }),
+      h("div", { class: "row" },
+        phoneOf(x.uid) || x.phone ? tel(phoneOf(x.uid) || x.phone, "Call " + (x.name || me.name || "them"), "") : null, op ? tel(op, "Call the " + (x.role === "driver" ? "customer" : "driver")) : null,
+        tel("112", "Call 112 (emergency)", "danger"), loc ? mapLink(loc[0], loc[1]) : null,
+        h("a", { class: "btn ghost", href: "https://wa.me/?text=" + encodeURIComponent(wmsg), target: "_blank", rel: "noopener", text: "Share by WhatsApp" })),
+      open ? h("div", { class: "list" }, noteBox("sosn-" + x.id), confirmBtn("Mark handled", "good", function () { var nt = $("sosn-" + x.id); dirty = false; act(call("/sos/" + x.id, "PATCH", { status: "handled", handledAt: Date.now(), adminNote: String((nt && nt.value) || "").slice(0, 500) })); }, "sh" + x.id)) : (x.adminNote ? h("p", { class: "muted small", text: "Note: " + x.adminNote }) : null));
+  }
+  function repCard(r) {
+    var o = D.orders[r.orderId] ? Object.assign({ id: r.orderId }, D.orders[r.orderId]) : null, tgt = D.users[r.targetId] || {}, rep = D.users[r.reporterId] || {}, open = r.status === "open", tn = repCount(r.targetId);
+    var act2 = function (status, action, label, cls, key, extra) { return confirmBtn(label, cls, function () { var nt = $("repn-" + r.id); dirty = false; var p = call("/reports/" + r.id, "PATCH", { status: status, action: action, adminNote: String((nt && nt.value) || "").slice(0, 500), resolvedAt: Date.now() }); act(extra ? p.then(extra) : p); }, key + r.id); };
+    return h("div", { class: "card " + (open ? "hl" : ""), "data-report": r.id },
+      h("div", { class: "row between" }, h("b", { text: (CATN[r.category] || r.category) }), h("span", { class: "pill " + (open ? "gold" : "ok"), text: open ? "NEW" : r.status + (r.action ? ": " + r.action : "") })),
+      h("p", { class: "muted small", text: ago(r.createdAt) + ". " + (r.reporterRole === "rider" ? "Customer " : "Driver ") + (rep.name || "(unknown)") + " reported the " + (r.reporterRole === "rider" ? "driver " : "customer ") + (tgt.name || "(unknown)") + (tn > 1 ? " (" + tn + " reports against them in total)" : "") + (o ? ". Trip " + o.type + ", code " + codeOf(o.id) : "") + "." }),
+      r.text ? h("p", { class: "pre", text: r.text }) : null,
+      h("div", { class: "row" }, phoneOf(r.targetId) ? tel(phoneOf(r.targetId), "Call " + (tgt.name || "them")) : null, phoneOf(r.reporterId) ? tel(phoneOf(r.reporterId), "Call reporter") : null, phoneOf(r.targetId) ? wa(phoneOf(r.targetId), "WhatsApp") : null,
+        tgt.status === "suspended" ? h("span", { class: "pill bad", text: "suspended" }) : null),
+      open ? h("div", { class: "list" }, noteBox("repn-" + r.id), h("div", { class: "row" },
+        act2("resolved", "warned", "Warn and close", "good", "rw"),
+        tgt.status === "suspended" ? null : act2("resolved", "suspended", "Suspend " + (tgt.name || "account"), "danger", "rs", function () { return call("/users/" + r.targetId, "PATCH", { status: "suspended" }); }),
+        act2("dismissed", "dismissed", "Dismiss", "", "rd"))) : (r.adminNote ? h("p", { class: "muted small", text: "Note: " + r.adminNote }) : null));
+  }
+  function vSafety(v) {
+    var os = openSos(), done = sosArr().filter(function (x) { return x.status !== "open"; }).slice(0, 10), rp = openReps(), rdone = repsArr().filter(function (x) { return x.status !== "open"; }).slice(0, 10);
+    v.append(h("div", { class: "card " + (os.length ? "warn" : ""), id: "sos-head" }, h("div", { class: "row between" }, h("h3", { text: "Emergency alerts" }), h("span", { class: "pill " + (os.length ? "bad" : "ok"), text: os.length ? os.length + " OPEN" : "none open" })),
+      h("p", { class: "muted small", text: "When a customer or driver taps Emergency, it appears here at once with their name, phone and live location. This page sounds a siren while it is open. Call 112 yourself from the buttons: Blue Wolf cannot dial emergency services for you automatically." }),
+      window.Notification && Notification.permission === "default" ? h("button", { type: "button", class: "btn ghost", id: "notif-on", onclick: function () { Notification.requestPermission().then(function () { draw(); }); } }, "Allow phone notifications for emergencies") : null,
+      h("button", { type: "button", class: "btn ghost", id: "siren-test", onclick: siren }, "Test the siren")));
+    os.forEach(function (x) { v.append(sosCard(x)); });
+    v.append(h("h3", { text: "Reports about drivers and customers" }));
+    if (!rp.length) v.append(h("p", { class: "empty", text: "No open reports." }));
+    rp.forEach(function (r) { v.append(repCard(r)); });
+    /* live trip monitor */
+    var live = ordersArr().filter(function (o) { return ["accepted", "arrived", "ongoing"].indexOf(o.status) > -1; }), now = Date.now();
+    v.append(h("h3", { text: "Live trips (" + live.length + ")" }));
+    if (!live.length) v.append(h("p", { class: "empty", text: "No trips in progress." }));
+    live.forEach(function (o) {
+      var dl = o.driverLoc, rl = o.riderLoc, dq = dl && dl.t ? now - dl.t : null, rq = rl && rl.t ? now - rl.t : null, quiet = (dq == null || dq > 240000) || (rq == null || rq > 240000);
+      v.append(h("div", { class: "card " + (quiet ? "warn" : ""), "data-live": o.id },
+        h("div", { class: "row between" }, h("b", { text: o.type + " " + o.status + ", code " + codeOf(o.id) }), h("span", { class: "pill " + (quiet ? "gold" : "ok"), text: quiet ? "signal gap" : "tracking" })),
+        h("p", { class: "muted small", text: "Driver " + nameOf(o.driverId) + (dq != null ? " (seen " + ago(dl.t) + ")" : " (no location yet)") + ". Customer " + nameOf(o.riderId) + (rq != null ? " (seen " + ago(rl.t) + ")" : " (no location yet)") + ". " + o.pickup + " to " + o.dropoff }),
+        h("div", { class: "row" }, phoneOf(o.driverId) ? tel(phoneOf(o.driverId), "Call driver") : null, phoneOf(o.riderId) ? tel(phoneOf(o.riderId), "Call customer") : null,
+          dl && dl.lat ? mapLink(dl.lat, dl.lng, "Driver on map") : null, rl && rl.lat ? mapLink(rl.lat, rl.lng, "Customer on map") : null)));
+    });
+    if (done.length || rdone.length) {
+      v.append(h("h3", { text: "Recently closed" }));
+      done.forEach(function (x) { v.append(sosCard(x)); });
+      rdone.forEach(function (r) { v.append(repCard(r)); });
+    }
+  }
+  function draw() {
+    if ((tab === "setup" || tab === "shops" || tab === "safety") && dirty) return;      /* never wipe what you are typing */
+    var tabs = $("tabs"); tabs.textContent = "";
+    var pend = usersArr().filter(function (u) { return u.driverStatus === "pending"; }).length, al = alerts().filter(function (a) { return a.sev !== "low"; }).length;
+    TABS.forEach(function (t) {
+      var b = h("button", { type: "button", role: "tab", "aria-selected": String(tab === t), onclick: function () { tab = t; pending = null; dirty = false; draw(); if (t === "shops") refresh(); } }, TNAMES[t]);
+      if (t === "drivers" && pend) b.append(h("span", { class: "badge", text: String(pend) }));
+      if (t === "alerts" && al) b.append(h("span", { class: "badge", text: String(al) }));
+      if (t === "safety" && (openSos().length + openReps().length)) b.append(h("span", { class: "badge", text: String(openSos().length + openReps().length) }));
+      tabs.append(b);
+    });
+    var v = $("view"); v.textContent = "";
+    ({ overview: vOverview, safety: vSafety, drivers: vDrivers, users: vUsers, orders: vOrders, shops: vShops, setup: vSetup, alerts: vAlerts })[tab](v);
+  }
+
+  /* ---------- Setup: insurance prices, drivers' monthly cover, payment and API connections ---------- */
+  var TK = ["bike", "car", "haulage"], TDEF = {
+    bike: { name: "Dispatch Bike", premium: 3000, avgFare: 2500, commissionPct: 30, multiplier: 2, tripsOverride: 0 },
+    car: { name: "Sedan / Car", premium: 12000, avgFare: 8000, commissionPct: 30, multiplier: 2, tripsOverride: 0 },
+    haulage: { name: "Haulage / Trailer", premium: 75000, avgFare: 180000, commissionPct: 30, multiplier: 2, tripsOverride: 0 } };
+  function nn(v, d, lo, hi) { v = Number(v); return isFinite(v) && v >= lo && v <= hi ? v : d; }
+  function tiersNow() {
+    var c = D.cfg || {}, out = {};
+    TK.forEach(function (k) { var d = TDEF[k], t = c.tiers && c.tiers[k] || {};
+      out[k] = { name: d.name, premium: nn(t.premium, d.premium, 1, 1e8), avgFare: nn(t.avgFare, d.avgFare, 1, 1e8), commissionPct: nn(t.commissionPct, d.commissionPct, .1, 100), multiplier: nn(t.multiplier, d.multiplier, 1, 20), tripsOverride: Math.round(nn(t.tripsOverride, 0, 0, 1e5)) }; });
+    return out;
+  }
+  function calc(t) { var target = t.multiplier * t.premium; return { target: target, trips: t.tripsOverride > 0 ? t.tripsOverride : Math.ceil(target / (t.avgFare * t.commissionPct / 100)) }; }
+  function money2(n) { return "₦" + Math.round(n || 0).toLocaleString("en-US"); }
+  function saveIns(patch) {      /* writes the whole insurance config, keeping what is already saved */
+    var c = D.cfg || {}, o = { enabled: c.enabled === true, live: c.live === true, unlockBy: c.unlockBy === "amount" ? "amount" : "trips", tiers: tiersNow(), updatedAt: Date.now() };
+    Object.keys(patch).forEach(function (k) { o[k] = patch[k]; });
+    return call("/config/insurance", "PUT", o);
+  }
+  function periodOf(ts) { var d = new Date(ts); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2); }
+  function coverInfo(u) {
+    var tiers = tiersNow(), k = u.driver && tiers[u.driver.tier] ? u.driver.tier : "car", t = tiers[k], cl = calc(t), now = new Date(), os = ordersArr();
+    var thisP = periodOf(now), lastP = periodOf(new Date(now.getFullYear(), now.getMonth() - 1, 15));
+    var mine = function (p) { return os.filter(function (o) { return o.driverId === u.uid && o.status === "done" && periodOf(o.updatedAt || o.createdAt) === p; }); };
+    var comm = function (list) { return list.reduce(function (s, o) { return s + o.fare * t.commissionPct / 100; }, 0); };
+    var cur = mine(thisP), last = mine(lastP), unlockBy = D.cfg && D.cfg.unlockBy === "amount" ? "amount" : "trips";
+    var earned = unlockBy === "amount" ? comm(last) >= cl.target : last.length >= cl.trips, paid = !!(u.insurancePaid && u.insurancePaid[thisP]);
+    return { k: k, t: t, cl: cl, n: cur.length, commission: comm(cur), lastN: last.length, lastC: comm(last), earned: earned, paid: paid, active: earned || paid, unlockBy: unlockBy };
+  }
+  function field(id, label, val, type, ph) { return h("label", { for: id }, label, h("input", { type: type || "text", id: id, value: val == null ? "" : String(val), placeholder: ph || "", autocomplete: "off", maxlength: "300", oninput: function () { dirty = true; recalc(); } })); }
+  function recalc() {
+    TK.forEach(function (k) {
+      var g = function (f) { var el = $("t-" + k + "-" + f); return el ? el.value : ""; };
+      var t = { premium: nn(g("premium"), 0, 0, 1e8), avgFare: nn(g("avgFare"), 0, 0, 1e8), commissionPct: nn(g("commissionPct"), 0, 0, 100), multiplier: nn(g("multiplier"), 0, 0, 20), tripsOverride: Math.round(nn(g("tripsOverride"), 0, 0, 1e5)) };
+      var out = $("t-" + k + "-out"); if (!out) return;
+      if (!(t.premium > 0 && t.avgFare > 0 && t.commissionPct > 0 && t.multiplier >= 1)) { out.textContent = "Fill in every box with a number."; return; }
+      var c = calc(t); out.textContent = "Needs " + c.trips + " trips a month, or " + money2(c.target) + " commission, to unlock next month's cover. Each trip earns Blue Wolf about " + money2(t.avgFare * t.commissionPct / 100) + ".";
+    });
+  }
+  /* Every outside service the platform can use. "now" = needed to take real payments or insurance, "optional" = nice to have. s = secret field. */
+  var PROV = {
+    flutterwave: { label: "Flutterwave", need: "now", group: "Payments (choose at least one)", purpose: "Takes customers' card and bank-transfer payments, and pays drivers out.", where: "flutterwave.com > Settings > API keys (use the test keys first).",
+      fields: [["publicKey", "Public key"], ["secretKey", "Secret key", 1], ["encryptionKey", "Encryption key", 1], ["webhookHash", "Webhook secret hash", 1]] },
+    monnify: { label: "Monnify", need: "now", group: "Payments (choose at least one)", purpose: "Virtual bank accounts for wallet top-ups, card payments and bank payouts to drivers.", where: "monnify.com > Settings > API keys and contract code (use the sandbox first).",
+      fields: [["apiKey", "API key"], ["secretKey", "Secret key", 1], ["contractCode", "Contract code"], ["webhookSecret", "Webhook secret", 1]] },
+    paystack: { label: "Paystack", need: "optional", group: "Payments (choose at least one)", purpose: "Another card and transfer processor. You only need one payment partner.", where: "paystack.com > Settings > API keys & webhooks.",
+      fields: [["publicKey", "Public key"], ["secretKey", "Secret key", 1], ["webhookSecret", "Webhook secret", 1]] },
+    myka: { label: "Myka (insurance broker)", need: "now", group: "Insurance", purpose: "Issues driver repair cover and trip cover, and sends policies on WhatsApp.", where: "Ask Myka for API access after your agreement. They give the base URL and key.",
+      fields: [["baseUrl", "API base URL"], ["apiKey", "API key", 1]] },
+    cloudinary: { label: "Cloudinary (photos and documents)", need: "now", group: "Files", purpose: "Stores drivers' licence photos and vehicle inspection photos securely.", where: "cloudinary.com > Dashboard > API keys. Free plan is enough to start.",
+      fields: [["cloudName", "Cloud name"], ["apiKey", "API key"], ["apiSecret", "API secret", 1], ["uploadPreset", "Signed upload preset name"]] },
+    googlemaps: { label: "Google Maps (optional)", need: "optional", group: "Maps and location", purpose: "Better address search, drivers' routes and traffic. The apps use free OpenStreetMap now, so this is optional.", where: "console.cloud.google.com > APIs & Services > Credentials. Turn on Maps JavaScript, Places and Directions. Restrict the browser key to your website address. Billing must be switched on.",
+      fields: [["browserKey", "Browser key (restricted to your website)"], ["serverKey", "Server key", 1]] },
+    osm: { label: "OpenStreetMap (free, no key)", need: "optional", group: "Maps and location", purpose: "Map tiles, address search (Nominatim) and road routes (OSRM) work with no key now. At bigger volume the free public servers limit you, so you may later use a paid host or your own server.", where: "Nothing to get today. Later: MapTiler, Stadia Maps, Geoapify or Mapbox give tile, search and routing keys.",
+      fields: [["tileUrl", "Map tile address (optional)"], ["geocoderUrl", "Address search address (optional)"], ["routingUrl", "Routing address (optional)"], ["providerKey", "Provider key (optional)", 1], ["contactEmail", "Contact email (required by the free Nominatim rules)"]] },
+    sms: { label: "SMS and phone verification", need: "optional", group: "Messages", purpose: "Texts one-time codes so people prove their phone number, and sends trip alerts by SMS.", where: "termii.com or africastalking.com > API key and sender ID.",
+      fields: [["provider", "Provider name (Termii or Africa's Talking)"], ["apiKey", "API key", 1], ["senderId", "Sender ID"]] },
+    whatsapp: { label: "WhatsApp Business", need: "optional", group: "Messages", purpose: "Sends trip updates, receipts and policy documents on WhatsApp.", where: "developers.facebook.com > WhatsApp > API setup (Meta Cloud API).",
+      fields: [["phoneNumberId", "Phone number ID"], ["accessToken", "Access token", 1], ["businessAccountId", "Business account ID"]] },
+    push: { label: "Push notifications", need: "optional", group: "Messages", purpose: "Alerts drivers instantly when a new request arrives, even when the app is closed.", where: "Firebase console > Project settings > Cloud Messaging.",
+      fields: [["serverKey", "Server key or service account", 1], ["senderId", "Sender ID"]] },
+    kyc: { label: "Driver ID verification (KYC)", need: "optional", group: "Safety", purpose: "Checks a driver's licence, NIN or BVN against official records, to cut fraud.", where: "smileidentity.com, youverify.co or dojah.io > API keys.",
+      fields: [["provider", "Provider name"], ["partnerId", "Partner or app ID"], ["apiKey", "API key", 1]] },
+    email: { label: "Email sending", need: "optional", group: "Messages", purpose: "Sends receipts and admin alerts by email.", where: "resend.com or sendgrid.com > API keys.",
+      fields: [["provider", "Provider name"], ["apiKey", "API key", 1], ["fromEmail", "Sender email address"]] }
+  };
+  var BANKF = [["bankName", "Bank name"], ["accountName", "Account name"], ["accountNumber", "Account number (10 digits)"], ["note", "Note (e.g. settlement account at Flutterwave)"]];
+  function savedFlag(p) { return !!(D.pay && D.pay.keysSaved && D.pay.keysSaved[p]); }
+  function savePromo(on) { return call("/config/promo", "PUT", { fundraise: on, updatedAt: Date.now() }); }
+  function savePay(patch) {
+    var c = D.pay || {}, o = { provider: c.provider || "none", mode: c.mode || "test", live: c.live === true, online: c.online === true, escrowEnabled: c.escrowEnabled !== false, keysSaved: c.keysSaved || {}, updatedAt: Date.now() };
+    Object.keys(patch).forEach(function (k) { o[k] = patch[k]; });
+    return call("/config/payments", "PUT", o);
+  }
+  function keyCard(p) {
+    var d = PROV[p], inputs = d.fields.map(function (f) {
+      return h("label", { for: "k-" + p + "-" + f[0] }, f[1], h("input", { type: f[2] ? "password" : "text", id: "k-" + p + "-" + f[0], placeholder: savedFlag(p) ? (f[2] ? "saved (type to replace)" : "saved or type new") : "", autocomplete: "off", maxlength: "300", oninput: function () { dirty = true; } }));
+    });
+    var body = h("div", { class: "list", style: "display:grid;gap:10px;margin-top:10px" },
+      h("p", { class: "small" }, h("b", { text: "What it is for: " }), d.purpose), h("p", { class: "small" }, h("b", { text: "Where to get it: " }), d.where),
+      inputs, h("p", { class: "err", id: "kerr-" + p, role: "alert" }),
+      h("div", { class: "row" },
+        h("button", { type: "button", class: "btn", id: "ksave-" + p, onclick: function () {
+          var o = {}, any = false;
+          d.fields.forEach(function (f) { var v = $("k-" + p + "-" + f[0]).value.trim(); if (v) { o[f[0]] = v.slice(0, 300); any = true; } });
+          if (!any) { $("kerr-" + p).textContent = "Type at least one value."; return; }
+          var ks = Object.assign({}, (D.pay && D.pay.keysSaved) || {}); ks[p] = true;
+          dirty = false; act(call("/connections/" + p, "PATCH", o).then(function () { return savePay({ keysSaved: ks }); }));
+        } }, "Save"),
+        savedFlag(p) ? confirmBtn("Remove", "danger", function () {
+          var ks = Object.assign({}, (D.pay && D.pay.keysSaved) || {}); ks[p] = false; dirty = false;
+          act(call("/connections/" + p, "DELETE").then(function () { return savePay({ keysSaved: ks }); }));
+        }, "rk" + p) : null));
+    var det = h("details", { class: "card", id: "key-" + p }, h("summary", { style: "cursor:pointer;display:flex;justify-content:space-between;gap:8px;align-items:center" },
+      h("b", { text: d.label }), h("span", { class: "pill " + (savedFlag(p) ? "ok" : d.need === "now" ? "gold" : ""), text: savedFlag(p) ? "saved" : d.need === "now" ? "needed" : "optional" })), body);
+    det.addEventListener("toggle", function () { OPEN[p] = det.open; });
+    if (OPEN[p]) det.open = true;
+    return det;
+  }
+  var OPEN = {};
+  function bankCard() {
+    var b = D.bank || {}, ins = BANKF.map(function (f) { return h("label", { for: "bk-" + f[0] }, f[1], h("input", { type: "text", id: "bk-" + f[0], value: b[f[0]] || "", autocomplete: "off", maxlength: "120", oninput: function () { dirty = true; } })); });
+    return h("div", { class: "card hl", id: "bank-card" }, h("div", { class: "row between" }, h("h3", { text: "Company bank account" }), h("span", { class: "pill " + (b.accountNumber ? "ok" : "gold"), text: b.accountNumber ? "saved" : "needed" })),
+      h("p", { class: "muted small", text: "The account customers pay into by bank transfer. Customers see the bank name, account name and account number when they place an order, so use a business account. The note below stays private to you." }),
+      ins, h("p", { class: "err", id: "bk-err", role: "alert" }),
+      h("button", { type: "button", class: "btn", id: "bk-save", onclick: function () {
+        var o = {}; BANKF.forEach(function (f) { o[f[0]] = $("bk-" + f[0]).value.trim().slice(0, 120); });
+        if (!o.bankName || !o.accountName || !/^[0-9]{10}$/.test(o.accountNumber)) { $("bk-err").textContent = "Fill in bank name, account name and a 10-digit account number."; return; }
+        var ks = Object.assign({}, (D.pay && D.pay.keysSaved) || {}); ks.bank = true;
+        dirty = false; act(call("/connections/bank", "PUT", o).then(function () { return call("/config/payto", "PUT", { bankName: o.bankName, accountName: o.accountName, accountNumber: o.accountNumber }); }).then(function () { return savePay({ keysSaved: ks }); }));
+      } }, "Save bank details"));
+  }
+  /* ---------- Fares: the numbers the app uses to work out every price ---------- */
+  var VK = ["bike", "car", "haulage"], VN = { bike: "Motorbike", car: "Car", haulage: "Truck" };
+  var FARE_DEF = { vehicles: { bike: { enabled: true, baseFare: 500, perKm: 170, minFare: 800 }, car: { enabled: true, baseFare: 800, perKm: 250, minFare: 1500 }, haulage: { enabled: true, baseFare: 3000, perKm: 600, minFare: 5000 } }, roundTo: 50, errandFee: 600, marketFee: 0, boostPct: 0, sizeExtra: { small: 0, medium: 500, large: 1500 } };
+  function fareNow() {
+    var c = D.fares || {}, se = c.sizeExtra || {}, d = FARE_DEF, cv = c.vehicles || {}, n = function (v, x) { v = Number(v); return isFinite(v) && v >= 0 ? v : x; }, out = { vehicles: {} };
+    VK.forEach(function (k) { var x = cv[k] || (k === "bike" && c.baseFare != null ? c : {}), dd = d.vehicles[k]; out.vehicles[k] = { enabled: cv[k] ? cv[k].enabled !== false : true, baseFare: n(x.baseFare, dd.baseFare), perKm: n(x.perKm, dd.perKm), minFare: n(x.minFare, dd.minFare) }; });
+    out.roundTo = [10, 50, 100].indexOf(Number(c.roundTo)) > -1 ? Number(c.roundTo) : 50; out.errandFee = n(c.errandFee, d.errandFee); out.marketFee = n(c.marketFee, d.marketFee); out.boostPct = n(c.boostPct, 0);
+    out.sizeExtra = { small: n(se.small, d.sizeExtra.small), medium: n(se.medium, d.sizeExtra.medium), large: n(se.large, d.sizeExtra.large) };
+    return out;
+  }
+  function fareCalc(c, type, km, size, vt) {
+    var V = c.vehicles[vt || "bike"], step = c.roundTo || 50, raw = Math.max(V.minFare, V.baseFare + V.perKm * km) * (1 + (c.boostPct || 0) / 100), f = Math.round(raw / step) * step;
+    return f + (type === "delivery" ? (c.sizeExtra[size] || 0) : type === "shop" ? c.errandFee : type === "market" ? c.marketFee : 0);
+  }
+  function fareForm() {
+    var c = fareNow(), F = [];
+    VK.forEach(function (k) { var V = c.vehicles[k]; F.push(["fr-" + k + "-base", VN[k] + ": starting price (NGN)", V.baseFare], ["fr-" + k + "-perkm", VN[k] + ": price per kilometre (NGN)", V.perKm], ["fr-" + k + "-min", VN[k] + ": lowest price for any trip (NGN)", V.minFare]); });
+    var G = [["fr-boost", "Price boost % for all trips (0 = none, e.g. 20 for rain or rush hour)", c.boostPct], ["fr-small", "Delivery extra: small parcel (NGN)", c.sizeExtra.small], ["fr-medium", "Delivery extra: medium parcel (NGN)", c.sizeExtra.medium],
+      ["fr-large", "Delivery extra: large parcel (NGN)", c.sizeExtra.large], ["fr-errand", "Extra for ask-a-driver-to-buy errands (NGN)", c.errandFee], ["fr-market", "Extra for partner-shop orders (NGN, 0 = none)", c.marketFee]];
+    var prev = h("div", { class: "pre small", id: "fr-preview" });
+    var g = function (id) { var v = Number(String($(id).value).replace(/[^0-9.]/g, "")); return isFinite(v) ? v : 0; };
+    function read() {
+      var o = { vehicles: {}, boostPct: g("fr-boost"), roundTo: Number($("fr-round").value), errandFee: g("fr-errand"), marketFee: g("fr-market"), sizeExtra: { small: g("fr-small"), medium: g("fr-medium"), large: g("fr-large") } };
+      VK.forEach(function (k) { o.vehicles[k] = { enabled: $("fr-" + k + "-on").checked, baseFare: g("fr-" + k + "-base"), perKm: g("fr-" + k + "-perkm"), minFare: g("fr-" + k + "-min") }; });
+      return o;
+    }
+    function show() {
+      var o = read(), L = [];
+      VK.forEach(function (k) { L.push(VN[k] + (o.vehicles[k].enabled ? "" : " (switched off)") + ":  " + [1, 2, 3, 5, 8, 12].map(function (km) { return km + " km " + money(fareCalc(o, "ride", km, "", k)); }).join("   ")); });
+      prev.textContent = L.join("\n");
+    }
+    var round = h("select", { id: "fr-round", onchange: function () { dirty = true; show(); } }, [10, 50, 100].map(function (r) { return h("option", Object.assign({ value: String(r) }, c.roundTo === r ? { selected: true } : {}), "Nearest " + r); }));
+    var inp = function (f) { return h("label", { for: f[0] }, f[1], h("input", { type: "text", id: f[0], inputmode: "decimal", value: String(f[2]), autocomplete: "off", maxlength: "7", oninput: function () { dirty = true; show(); } })); };
+    var blocks = VK.map(function (k) {
+      return h("div", { class: "card", style: "margin:8px 0" }, h("h3", { text: VN[k] }),
+        h("label", { class: "row", for: "fr-" + k + "-on" }, h("input", { type: "checkbox", id: "fr-" + k + "-on", checked: c.vehicles[k].enabled, onchange: function () { dirty = true; show(); } }), h("span", { text: " Customers can book this vehicle" })),
+        F.filter(function (f) { return f[0].indexOf("fr-" + k + "-") === 0; }).map(inp));
+    });
+    var card = h("div", { class: "card hl", id: "fare-card" }, h("div", { class: "row between" }, h("h3", { text: "Fares by vehicle" }), h("span", { class: "pill " + (D.fares ? "ok" : "gold"), text: D.fares ? "your prices" : "default prices" })),
+      h("p", { class: "muted small", text: "Each vehicle has its own price: starting price + price per km, never below its lowest price, then rounded. Customers see the price for every vehicle and choose. Switch a vehicle off to stop it being booked. New prices reach customers within a minute. Trips already ordered keep their price." }),
+      blocks, G.map(inp), h("label", { for: "fr-round" }, "Round prices to", round),
+      h("p", { class: "muted small", text: "Ride examples with these numbers (edit and watch them change):" }), prev,
+      h("p", { class: "err", id: "fr-err", role: "alert" }),
+      h("div", { class: "row" },
+        h("button", { type: "button", class: "btn", id: "fr-save", onclick: function () {
+          var o = read(); o.updatedAt = Date.now();
+          var bad = o.boostPct > 300 || o.errandFee > 100000 || o.marketFee > 100000 || o.sizeExtra.small > 100000 || o.sizeExtra.medium > 100000 || o.sizeExtra.large > 100000;
+          VK.forEach(function (k) { var V = o.vehicles[k]; if (V.baseFare > 100000 || V.perKm > 10000 || V.minFare > 100000 || V.minFare <= 0 || V.perKm <= 0) bad = true; });
+          if (bad) { $("fr-err").textContent = "Check the numbers: each lowest price and price per km must be above zero, and none can be absurdly large."; return; }
+          $("fr-err").textContent = ""; dirty = false; act(call("/config/fares", "PUT", o));
+        } }, "Save fares"),
+        confirmBtn("Go back to default prices", "danger", function () { dirty = false; act(call("/config/fares", "DELETE")); }, "frd")));
+    setTimeout(show, 0);
+    return card;
+  }
+  /* ---------- Places: new junctions and spots the free map does not know ---------- */
+  function placesNow() { var c = D.places || {}, l = c.list ? (Array.isArray(c.list) ? c.list : Object.keys(c.list).map(function (k) { return c.list[k]; })) : []; return l.filter(function (z) { return z && z.name && isFinite(z.lat) && isFinite(z.lng); }).map(function (z) { return { name: String(z.name), lat: Number(z.lat), lng: Number(z.lng) }; }); }
+  function savePlaces(list) { return call("/config/places", "PUT", { list: list, updatedAt: Date.now() }); }
+  function gmap(z) { return "https://www.google.com/maps?q=" + z.lat + "," + z.lng; }
+  function placeCard() {
+    var list = placesNow(), sug = Object.keys(D.psug || {}).map(function (k) { var z = D.psug[k] || {}; return { id: k, name: String(z.name || ""), lat: Number(z.lat), lng: Number(z.lng), t: z.createdAt || 0 }; }).filter(function (z) { return z.name && isFinite(z.lat) && isFinite(z.lng); }).sort(function (a, b) { return b.t - a.t; });
+    var nm = h("input", { type: "text", id: "pl-name", placeholder: "Name, e.g. Summit Junction", maxlength: "60", autocomplete: "off" });
+    var ll = h("input", { type: "text", id: "pl-ll", placeholder: "Numbers from Google Maps, e.g. 6.2017, 6.7333", autocomplete: "off" });
+    var err = h("p", { class: "err", id: "pl-err", role: "alert" });
+    var rowsS = sug.length ? sug.map(function (z) {
+      return h("div", { class: "card", style: "margin:8px 0", "data-sug": z.id }, h("b", { text: z.name }), h("p", { class: "muted small" }, h("a", { href: gmap(z), target: "_blank", rel: "noopener", style: "color:var(--gold-soft)" }, "Open this spot on Google Maps"), "  " + z.lat.toFixed(5) + ", " + z.lng.toFixed(5) + "  " + ago(z.t)),
+        h("div", { class: "row" },
+          confirmBtn("Add to the map for everyone", "good", function () { var l = placesNow(); l.push({ name: z.name, lat: z.lat, lng: z.lng }); act(savePlaces(l).then(function () { return call("/placeSuggestions/" + z.id, "DELETE"); })); }, "ps" + z.id),
+          confirmBtn("Ignore", "danger", function () { act(call("/placeSuggestions/" + z.id, "DELETE")); }, "pi" + z.id)));
+    }) : [h("p", { class: "muted small", text: "No new suggestions. When a customer or driver names a new spot in the app, it appears here for you to approve." })];
+    var rowsL = list.map(function (z, i) { return h("div", { class: "row between", "data-place": String(i) }, h("span", { text: z.name }), confirmBtn("Remove", "danger", function () { var l = placesNow(); l.splice(i, 1); act(savePlaces(l)); }, "pr" + i)); });
+    return h("div", { class: "card hl", id: "places-card" }, h("div", { class: "row between" }, h("h3", { text: "Places on the map" }), h("span", { class: "pill " + (sug.length ? "gold" : "ok"), text: sug.length ? sug.length + " new" : list.length + " saved" })),
+      h("p", { class: "muted small", text: "The free map does not know every new junction, estate or shop. Add them here and they appear as gold pins on the app map and in place search for everyone. Customers and drivers can also name a spot in the app; you approve it below." }),
+      h("h3", { text: "Suggested by users" }), rowsS,
+      h("h3", { style: "margin-top:14px", text: "Add one yourself" }),
+      h("label", null, "Place name", nm), h("label", null, "Centre point", ll),
+      h("p", { class: "muted small", text: "To get the numbers: open Google Maps, press and hold on the spot, copy the two numbers shown at the top." }), err,
+      h("button", { type: "button", class: "btn", id: "pl-add", onclick: function () {
+        var m = ll.value.match(/(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)/), name = nm.value.trim();
+        if (name.length < 2 || !m || +m[1] < 3 || +m[1] > 15 || +m[2] < 2 || +m[2] > 16) { err.textContent = "Add a name and the two numbers from Google Maps."; return; }
+        err.textContent = ""; var l = placesNow(); l.push({ name: name.slice(0, 60), lat: Number(m[1]), lng: Number(m[2]) }); act(savePlaces(l));
+      } }, "Add place"),
+      h("h3", { style: "margin-top:14px", text: "Saved places (" + list.length + ")" }), rowsL.length ? rowsL : [h("p", { class: "muted small", text: "None yet." })]);
+  }
+  /* ---------- Zones: places where some vehicles may not go ---------- */
+  var ZONE_STATE = null;
+  function zonesNow() { var c = D.zones || {}, l = c.list ? (Array.isArray(c.list) ? c.list : Object.keys(c.list).map(function (k) { return c.list[k]; })) : []; return { hideOther: !!c.hideOther, list: l.filter(Boolean).map(function (z) { return { name: z.name || "", lat: z.lat, lng: z.lng, r: z.r, block: z.block || {} }; }) }; }
+  function zoneCard() {
+    if (!ZONE_STATE || !dirty) ZONE_STATE = zonesNow();
+    var Z = ZONE_STATE, rows = h("div", { class: "list", id: "zone-rows" });
+    function onEdit() { dirty = true; }
+    function row(z, i) {
+      var nm = h("input", { type: "text", value: z.name, placeholder: "Name, e.g. Asaba town centre", maxlength: "60", oninput: function () { z.name = nm.value; onEdit(); } });
+      var ll = h("input", { type: "text", value: (z.lat != null && z.lng != null) ? z.lat + ", " + z.lng : "", placeholder: "Paste the numbers from Google Maps, e.g. 6.2017, 6.7333", inputmode: "text", oninput: function () { var m = ll.value.match(/(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)/); if (m) { z.lat = Number(m[1]); z.lng = Number(m[2]); } onEdit(); } });
+      var rk = h("input", { type: "text", inputmode: "decimal", value: z.r ? String(Math.round(z.r / 100) / 10) : "", placeholder: "Radius in km, e.g. 4", oninput: function () { var v = Number(rk.value.replace(/[^0-9.]/g, "")); z.r = isFinite(v) ? Math.round(v * 1000) : 0; onEdit(); } });
+      var bl = VK.map(function (k) { return h("label", { class: "row" }, h("input", { type: "checkbox", checked: !!z.block[k], onchange: function (e) { if (e.target.checked) z.block[k] = true; else delete z.block[k]; onEdit(); } }), h("span", { text: " " + VN[k] + "s not allowed" })); });
+      return h("div", { class: "card", style: "margin:8px 0", "data-zone": String(i) }, h("label", null, "Area name", nm), h("label", null, "Centre point", ll), h("label", null, "Radius (km)", rk), bl,
+        h("button", { type: "button", class: "btn danger", onclick: function () { Z.list.splice(i, 1); onEdit(); redraw(); } }, "Remove this area"));
+    }
+    function redraw() { rows.replaceChildren.apply(rows, Z.list.length ? Z.list.map(row) : [h("p", { class: "muted small", text: "No restricted areas yet. Every vehicle can go everywhere." })]); }
+    redraw();
+    var hide = h("input", { type: "checkbox", id: "zone-hide", checked: Z.hideOther, onchange: function () { Z.hideOther = hide.checked; onEdit(); } });
+    return h("div", { class: "card hl", id: "zone-card" }, h("h3", { text: "Where each vehicle may go" }),
+      h("p", { class: "muted small", text: "Mark an area (a centre point and a radius) and tick the vehicles that may NOT go there, for example motorbikes in the main Asaba town. A customer cannot book a blocked vehicle for any trip that starts, ends or passes through that area, and sees the reason. To get the centre point: open Google Maps, press and hold on the spot, then copy the two numbers shown at the top of the screen." }),
+      rows,
+      h("div", { class: "row" }, h("button", { type: "button", class: "btn", id: "zone-add", onclick: function () { Z.list.push({ name: "", lat: null, lng: null, r: 0, block: { bike: true } }); onEdit(); redraw(); } }, "Add an area"),
+        h("button", { type: "button", class: "btn", id: "zone-asaba", onclick: function () { Z.list.push({ name: "Asaba town centre", lat: 6.2017, lng: 6.7333, r: 4000, block: { bike: true } }); onEdit(); redraw(); } }, "Add Asaba town centre (starting suggestion)")),
+      h("label", { class: "row", for: "zone-hide" }, hide, h("span", { text: " Hide trips from drivers whose vehicle cannot take them. (Off: drivers still see them, greyed out, with a message that their vehicle cannot take the trip.)" })),
+      h("p", { class: "muted small", text: "Drivers only ever see trips that you have approved by confirming the customer's payment. A car trip can only be accepted by a car driver, a motorbike trip by a motorbike rider, a truck trip by a truck driver." }),
+      h("p", { class: "err", id: "zone-err", role: "alert" }),
+      h("button", { type: "button", class: "btn", id: "zone-save", onclick: function () {
+        var bad = Z.list.some(function (z) { return !(isFinite(z.lat) && isFinite(z.lng) && z.lat != null && z.lng != null && z.r > 0 && z.name.trim()); });
+        if (bad) { $("zone-err").textContent = "Every area needs a name, a centre point (two numbers) and a radius above zero."; return; }
+        var out = { hideOther: !!Z.hideOther, list: Z.list.map(function (z) { return { name: z.name.trim().slice(0, 60), lat: z.lat, lng: z.lng, r: z.r, block: z.block }; }), updatedAt: Date.now() };
+        $("zone-err").textContent = ""; dirty = false; act(call("/config/zones", "PUT", out));
+      } }, "Save areas"));
+  }
+  function vSetup(v) {
+    var tiers = tiersNow(), cfg = D.cfg || {}, pay = D.pay || {};
+    v.append(fareForm());
+    v.append(zoneCard());
+    v.append(placeCard());
+    /* 1. insurance prices and rules */
+    var unlock = h("select", { id: "set-unlock", onchange: function () { dirty = true; } },
+      h("option", Object.assign({ value: "trips" }, cfg.unlockBy !== "amount" ? { selected: true } : {}), "Number of trips"), h("option", Object.assign({ value: "amount" }, cfg.unlockBy === "amount" ? { selected: true } : {}), "Commission amount earned"));
+    var card = h("div", { class: "card hl", id: "tiers" }, h("h3", { text: "Insurance prices and unlock rules" }),
+      h("p", { class: "muted small", text: "Change any number. A driver unlocks next month's cover by finishing the trips (or earning the commission) below in one month. The needed trips are worked out for you: doubled premium divided by commission per trip. Type a number in \"Trips needed\" to override it." }),
+      h("label", { for: "set-unlock" }, "Unlock cover by", unlock));
+    TK.forEach(function (k) {
+      var t = tiers[k];
+      card.append(h("div", { class: "card", id: "tier-" + k }, h("b", { text: t.name }),
+        field("t-" + k + "-premium", "Monthly insurance premium (NGN)", t.premium, "text"), field("t-" + k + "-avgFare", "Average fare (NGN)", t.avgFare, "text"),
+        field("t-" + k + "-commissionPct", "Blue Wolf commission (%)", t.commissionPct, "text"), field("t-" + k + "-multiplier", "Commission target (x premium)", t.multiplier, "text"),
+        field("t-" + k + "-tripsOverride", "Trips needed (0 = automatic)", t.tripsOverride, "text"),
+        h("p", { class: "small", id: "t-" + k + "-out" })));
+    });
+    card.append(h("p", { class: "err", id: "tiers-err", role: "alert" }), h("button", { type: "button", class: "btn", id: "tiers-save", onclick: function () {
+      var o = { tiers: {} }, bad = "";
+      TK.forEach(function (k) {
+        var g = function (f) { return String($("t-" + k + "-" + f).value).replace(/[, ]/g, ""); }, t = { name: TDEF[k].name };
+        t.premium = Number(g("premium")); t.avgFare = Number(g("avgFare")); t.commissionPct = Number(g("commissionPct")); t.multiplier = Number(g("multiplier")); t.tripsOverride = Math.round(Number(g("tripsOverride") || 0));
+        if (!(t.premium > 0 && t.premium <= 1e8 && t.avgFare > 0 && t.avgFare <= 1e8 && t.commissionPct >= .1 && t.commissionPct <= 100 && t.multiplier >= 1 && t.multiplier <= 20 && t.tripsOverride >= 0 && t.tripsOverride <= 1e5)) bad = TDEF[k].name;
+        o.tiers[k] = t;
+      });
+      if (bad) { $("tiers-err").textContent = "Check the numbers for " + bad + "."; return; }
+      o.unlockBy = $("set-unlock").value; dirty = false; act(saveIns(o));
+    } }, "Save insurance settings"));
+    v.append(card);
+    /* Myka live toggle */
+    v.append(h("div", { class: "card" + (cfg.live ? "" : " warn"), id: "live-card" }, h("div", { class: "row between" }, h("b", { text: "Myka is live" }), h("span", { class: "pill " + (cfg.live ? "ok" : "bad"), id: "live-state", text: cfg.live ? "LIVE" : "NOT LIVE" })),
+      h("p", { class: "muted small", text: "Turn this on only after Myka has approved you and your server can bind policies. While it is off, drivers cannot pay for insurance themselves and no cover is claimed to be real." }),
+      cfg.live ? confirmBtn("Mark Myka NOT live", "danger", function () { act(saveIns({ live: false })); }, "lv0") : confirmBtn("Mark Myka live", "good", function () { act(saveIns({ live: true })); }, "lv1")));
+    /* 2. drivers' monthly cover */
+    var dv = h("div", { class: "card", id: "cover-table" }, h("h3", { text: "Drivers and monthly cover" }));
+    var drivers = usersArr().filter(function (u) { return u.driverStatus === "approved"; });
+    if (!drivers.length) dv.append(h("p", { class: "empty", text: "No approved drivers yet." }));
+    drivers.forEach(function (u) {
+      var c = coverInfo(u), sel = h("select", { id: "dt-" + u.uid, "aria-label": "Vehicle type", onchange: function (e) { act(call("/users/" + u.uid + "/driver", "PATCH", { tier: e.target.value })); } },
+        TK.map(function (k) { return h("option", Object.assign({ value: k }, k === c.k ? { selected: true } : {}), TDEF[k].name); }));
+      dv.append(h("div", { class: "kv", style: "border-top:1px solid var(--line);padding-top:8px" },
+        h("div", null, h("b", { text: u.name + "  " }), h("span", { class: "pill " + (c.active ? "ok" : ""), text: c.active ? "cover active" : "no cover" })),
+        sel,
+        h("div", null, h("span", { text: "This month  " }), c.n + " of " + c.cl.trips + " trips, " + money2(c.commission) + " of " + money2(c.cl.target) + " commission"),
+        h("div", null, h("span", { text: "Last month  " }), c.lastN + " trips, " + money2(c.lastC) + (c.earned ? "  (earned cover)" : "  (not enough)")),
+        h("div", null, h("span", { text: "Paid insurance directly  " }), c.paid ? "yes" : "no")));
+    });
+    v.append(dv);
+    /* 3. payments and connections */
+    var provSel = h("select", { id: "pay-provider", onchange: function () { dirty = true; } }, ["none", "flutterwave", "monnify", "paystack"].map(function (p) { return h("option", Object.assign({ value: p }, (pay.provider || "none") === p ? { selected: true } : {}), p === "none" ? "None yet" : PROV[p].label); }));
+    var modeSel = h("select", { id: "pay-mode", onchange: function () { dirty = true; } }, ["test", "live"].map(function (m) { return h("option", Object.assign({ value: m }, (pay.mode || "test") === m ? { selected: true } : {}), m === "test" ? "Test mode (no real money)" : "Live mode (real money)"); }));
+    var chk = function (id, on, text) { return h("label", { for: id, style: "display:flex;gap:10px;align-items:center;color:var(--text);font-weight:500" }, h("input", Object.assign({ type: "checkbox", id: id, onchange: function () { dirty = true; } }, on ? { checked: true } : {})), text); };
+    var promoOn = !(D.promo && D.promo.fundraise === false);
+    v.append(h("div", { class: "card", id: "promo-card" }, h("div", { class: "row between" }, h("h3", { text: "Fundraising notice" }), h("span", { class: "pill " + (promoOn ? "ok" : "bad"), id: "promo-state", text: promoOn ? "SHOWING" : "HIDDEN" })),
+      h("p", { class: "muted small", text: "A small dismissible card in the customer and driver app: Blue Wolf is raising a pre-seed round, with a WhatsApp link to you. It never shows during a trip. Turn it off when you have raised." }),
+      promoOn ? confirmBtn("Hide the fundraising notice", "danger", function () { act(savePromo(false)); }, "pr0") : confirmBtn("Show the fundraising notice", "good", function () { act(savePromo(true)); }, "pr1")));
+    v.append(h("div", { class: "card hl", id: "pay-card" }, h("h3", { text: "Payments and escrow" }),
+      h("p", { class: "muted small", text: "Customers pay by bank transfer into your company account (set it below). You confirm each transfer in Orders, and only then does the order go to drivers. Choose Monnify or Flutterwave to make that confirmation automatic later. Escrow means the money is held by Blue Wolf and released to the driver's wallet only when the trip is completed." }),
+      h("label", { for: "pay-provider" }, "Payment partner", provSel), h("label", { for: "pay-mode" }, "Mode", modeSel),
+      chk("pay-escrow", pay.escrowEnabled !== false, "Hold payments in escrow until the trip is completed"),
+      h("button", { type: "button", class: "btn", id: "pay-save", onclick: function () { dirty = false; act(savePay({ provider: $("pay-provider").value, mode: $("pay-mode").value, escrowEnabled: $("pay-escrow").checked })); } }, "Save payment settings"),
+      h("div", { class: "row between" }, h("b", { text: "Payments live" }), h("span", { class: "pill " + (pay.live ? "ok" : "bad"), id: "paylive-state", text: pay.live ? "LIVE" : "NOT LIVE" })),
+      h("p", { class: "muted small", text: "Mark live only after Monnify or Flutterwave confirms transfers automatically through a small server. Until then you confirm each transfer by hand in Orders." }),
+      pay.live ? confirmBtn("Mark payments NOT live", "danger", function () { act(savePay({ live: false })); }, "pl0") : confirmBtn("Mark payments live", "good", function () { act(savePay({ live: true })); }, "pl1")));
+    v.append(h("div", { class: "card warn" }, h("h3", { text: "About the keys below" }),
+      h("p", { class: "muted small", text: "Keys you save here go into your database in a place only your admin login can read. They are write-only here: this page never shows them again. The customer and driver apps never receive them. Only a server you build later can use secret keys to really charge cards and pay drivers. Never paste secret keys anywhere else." }),
+      h("p", { class: "muted small", text: "When you build that server, point each partner's webhook at https://YOUR-SERVER/webhooks/<partner>." })));
+    v.append(bankCard());
+    var keys = Object.keys(PROV), list = h("div", { class: "card", id: "checklist" }, h("h3", { text: "Connections checklist" }),
+      h("p", { class: "muted small", text: "Everything the platform can connect to. \"Needed\" ones are required before you can take real payments and insurance. Tap one below to see what to get and where to type it." }));
+    list.append(h("div", { class: "kv" }, h("div", null, h("span", { text: "Company bank account  " }), D.bank && D.bank.accountNumber ? "saved" : "NEEDED")));
+    keys.forEach(function (p) { list.append(h("div", { class: "kv" }, h("div", null, h("span", { text: PROV[p].label + "  " }), savedFlag(p) ? "saved" : PROV[p].need === "now" ? "NEEDED" : "optional"))); });
+    v.append(list);
+    var seen = {};
+    keys.forEach(function (p) { var g = PROV[p].group; if (!seen[g]) { seen[g] = 1; v.append(h("h2", { text: g })); } v.append(keyCard(p)); });
+    recalc();
+  }
+
+  function vOverview(v) {
+    var us = usersArr(), os = ordersArr(), day = new Date(); day.setHours(0, 0, 0, 0);
+    var today = os.filter(function (o) { return o.createdAt >= day.getTime(); });
+    var stat = function (n, l) { return h("div", { class: "stat" }, h("b", { text: String(n) }), h("span", { class: "muted small", text: l })); };
+    v.append(h("div", { class: "grid" },
+      stat(us.length, "Accounts"), stat(us.filter(function (u) { return u.driverStatus === "approved"; }).length, "Approved drivers"),
+      stat(us.filter(function (u) { return u.driverStatus === "pending"; }).length, "Waiting for approval"), stat(us.filter(function (u) { return u.status === "suspended"; }).length, "Suspended"),
+      stat(os.filter(function (o) { return ["requested", "accepted", "arrived", "ongoing"].indexOf(o.status) > -1; }).length, "Jobs in progress"), stat(today.length, "Orders today"),
+      stat(today.filter(function (o) { return o.status === "done"; }).length, "Completed today"), stat(alerts().filter(function (a) { return a.sev !== "low"; }).length, "Alerts")));
+    v.append(h("div", { class: "card" + (D.ins ? "" : " warn"), id: "ins-card" },
+      h("div", { class: "row between" }, h("h3", { text: "Insurance master switch" }), h("span", { class: "pill " + (D.ins ? "ok" : "bad"), id: "ins-state", text: D.ins ? "ON" : "OFF" })),
+      h("p", { class: "muted small", text: D.ins ? "ON: drivers see \"Insurance: On\". Prices, trip targets and payments are set on the Setup tab." : "OFF: drivers see \"Insurance: Disabled\". Nothing else about insurance is shown. This is the safe setting until Myka is connected." }),
+      h("p", { class: "muted small", text: "Myka: " + (D.pay && D.pay.keysSaved && D.pay.keysSaved.myka ? "keys saved" : "not connected") + (D.cfg && D.cfg.live ? ", marked LIVE" : ", not live") + ". Go to Setup to enter details." }),
+      D.ins ? confirmBtn("Turn insurance OFF", "danger", function () { act(saveIns({ enabled: false })); }, "insoff")
+            : confirmBtn("Turn insurance ON", "good", function () { act(saveIns({ enabled: true })); }, "inson")));
+    v.append(h("div", { class: "card" }, h("h3", { text: "What you can do here" }), h("p", { class: "muted small", text: "Drivers: approve or reject applications. Users: suspend, reactivate, or flag an account. Orders: watch jobs and cancel one. Alerts: possible fraud signs found automatically. Only your account can open this page." })));
+  }
+  function userCard(u, opts) {
+    var n = D.notes[u.uid] || {}, c = counts(u.uid), dr = u.driver || {};
+    var card = h("div", { class: "card" + (u.status === "suspended" ? " warn" : "") },
+      h("div", { class: "row between" }, h("b", { text: u.name || "(no name)" }), h("div", { class: "row" },
+        h("span", { class: "pill " + (u.status === "suspended" ? "bad" : "ok"), text: u.status }),
+        u.driverStatus && u.driverStatus !== "none" ? h("span", { class: "pill " + (u.driverStatus === "approved" ? "ok" : u.driverStatus === "pending" ? "gold" : "bad"), text: "driver " + u.driverStatus }) : null,
+        n.flagged ? h("span", { class: "pill bad", text: "flagged" }) : null,
+        null)),
+      h("div", { class: "kv" }, h("div", null, h("span", { text: "Phone  " }), u.phone), u.driver ? h("div", null, h("span", { text: "Vehicle  " }), (dr.vehicle || "") + "  " + (dr.plate || "") + (dr.tier ? "  (" + ({ bike: "bike", car: "car", haulage: "haulage" }[dr.tier] || "") + ")" : "")) : null,
+        u.driver ? h("div", null, h("span", { text: "Licence  " }), dr.licence || "") : null,
+        h("div", null, h("span", { text: "Joined  " }), ago(u.createdAt)), h("div", null, h("span", { text: "Activity  " }), c.rider + " orders placed, " + c.cancelled + " cancelled, " + c.drove + " jobs driven"),
+        n.note ? h("div", { class: "pre" }, h("span", { text: "Note  " }), n.note) : null),
+      h("div", { class: "row" }, wa(u.phone, "WhatsApp"), opts && opts.drivers ? driverButtons(u) : null,
+        u.status === "suspended" ? confirmBtn("Reactivate", "good", function () { act(call("/users/" + u.uid, "PATCH", { status: "active" })); }, "re" + u.uid) : confirmBtn("Suspend account", "danger", function () { act(call("/users/" + u.uid, "PATCH", { status: "suspended" })); }, "su" + u.uid),
+        n.flagged ? h("button", { type: "button", class: "btn ghost", onclick: function () { act(call("/adminNotes/" + u.uid, "PUT", { flagged: false, note: n.note || "", at: Date.now() })); } }, "Clear flag")
+          : h("button", { type: "button", class: "btn ghost", onclick: function () { var t = prompt ? "" : ""; flagUser(u); } }, "Flag")));
+    return card;
+  }
+  function flagUser(u) {
+    var note = window.prompt("Why are you flagging " + (u.name || "this account") + "? (kept private, visible only to you)", "");
+    if (note === null) return;
+    act(call("/adminNotes/" + u.uid, "PUT", { flagged: true, note: String(note).slice(0, 200), at: Date.now() }));
+  }
+  function driverButtons(u) {
+    if (u.driverStatus === "pending" || u.driverStatus === "rejected") return [confirmBtn("Approve driver", "good", function () { act(call("/users/" + u.uid, "PATCH", { driverStatus: "approved" })); }, "ap" + u.uid), u.driverStatus === "pending" ? confirmBtn("Reject", "danger", function () { act(call("/users/" + u.uid, "PATCH", { driverStatus: "rejected" })); }, "rj" + u.uid) : null];
+    if (u.driverStatus === "approved") return confirmBtn("Remove driver access", "danger", function () { act(call("/users/" + u.uid, "PATCH", { driverStatus: "rejected" })); }, "rv" + u.uid);
+    return null;
+  }
+  function vDrivers(v) {
+    var us = usersArr(), pend = us.filter(function (u) { return u.driverStatus === "pending"; }), appr = us.filter(function (u) { return u.driverStatus === "approved"; }), rej = us.filter(function (u) { return u.driverStatus === "rejected"; });
+    v.append(h("h2", { text: "Waiting for approval (" + pend.length + ")" }));
+    if (!pend.length) v.append(h("p", { class: "empty", text: "No applications waiting." }));
+    pend.forEach(function (u) { v.append(userCard(u, { drivers: true })); });
+    v.append(h("h2", { text: "Approved drivers (" + appr.length + ")" }));
+    if (!appr.length) v.append(h("p", { class: "empty", text: "No approved drivers yet." }));
+    appr.forEach(function (u) { v.append(userCard(u, { drivers: true })); });
+    if (rej.length) { v.append(h("h2", { text: "Rejected or removed (" + rej.length + ")" })); rej.forEach(function (u) { v.append(userCard(u, { drivers: true })); }); }
+  }
+  function vUsers(v) {
+    v.append(h("label", { for: "q" }, "Find an account", search));
+    search.oninput = function () { var c = search.selectionStart; draw(); search.focus(); try { search.setSelectionRange(c, c); } catch (e) {} };
+    var q = search.value.trim().toLowerCase(), us = usersArr().filter(function (u) { return !q || (u.name || "").toLowerCase().indexOf(q) > -1 || String(u.phone).indexOf(q.replace(/[^0-9]/g, "") || "~") > -1; });
+    if (!us.length) v.append(h("p", { class: "empty", text: "No accounts found." }));
+    us.slice(0, 50).forEach(function (u) { v.append(userCard(u, { drivers: u.driverStatus && u.driverStatus !== "none" })); });
+  }
+  var PV = {}, TR = {};
+  function parseTrail(d) { var out = {}; ['rider', 'driver'].forEach(function (k) { var pts = []; Object.keys((d && d[k]) || {}).sort().forEach(function (b) { String(d[k][b]).split(';').forEach(function (p) { var q = p.split(',').map(Number); if (q.length === 3 && isFinite(q[0]) && isFinite(q[1])) pts.push(q); }); }); pts.sort(function (a, b) { return a[2] - b[2]; }); out[k] = pts; }); return out; }
+  function trailSvg(t) {
+    var all = t.rider.concat(t.driver); if (!all.length) return h('p', { class: 'muted small', text: 'No trail saved yet. Points arrive in small batches and when the phone is back online.' });
+    var la = all.map(function (p) { return p[0]; }), ln = all.map(function (p) { return p[1]; }), a0 = Math.min.apply(null, la), a1 = Math.max.apply(null, la), n0 = Math.min.apply(null, ln), n1 = Math.max.apply(null, ln), W = 280, H = 150, pad = 10;
+    function X(v) { return pad + (n1 === n0 ? (W - 2 * pad) / 2 : (v - n0) / (n1 - n0) * (W - 2 * pad)); } function Y(v) { return H - pad - (a1 === a0 ? (H - 2 * pad) / 2 : (v - a0) / (a1 - a0) * (H - 2 * pad)); }
+    var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('width', W); svg.style.background = 'rgba(255,255,255,.05)'; svg.style.borderRadius = '10px';
+    [['rider', '#ffffff'], ['driver', '#22d3ee']].forEach(function (c) { var pts = t[c[0]]; if (!pts.length) return; var pl = document.createElementNS(NS, 'polyline'); pl.setAttribute('points', pts.map(function (p) { return X(p[1]).toFixed(1) + ',' + Y(p[0]).toFixed(1); }).join(' ')); pl.setAttribute('fill', 'none'); pl.setAttribute('stroke', c[1]); pl.setAttribute('stroke-width', '2'); svg.appendChild(pl); var e = pts[pts.length - 1], d = document.createElementNS(NS, 'circle'); d.setAttribute('cx', X(e[1])); d.setAttribute('cy', Y(e[0])); d.setAttribute('r', '4'); d.setAttribute('fill', c[1]); svg.appendChild(d); });
+    return h('div', null, svg, h('p', { class: 'muted small', text: 'White line: customer (' + t.rider.length + ' points). Blue line: driver (' + t.driver.length + ' points). Dots are the last saved position.' }));
+  }
+  function locLine(o, key, label) {
+    var l = o[key]; if (!l || !l.lat) return h('div', null, h('span', { text: label + '  ' }), 'no location yet');
+    return h('div', null, h('span', { text: label + '  ' }), h('a', { href: 'https://www.openstreetmap.org/?mlat=' + l.lat + '&mlon=' + l.lng + '#map=17/' + l.lat + '/' + l.lng, target: '_blank', rel: 'noopener', text: l.lat.toFixed(5) + ', ' + l.lng.toFixed(5) }), h('span', { class: (Date.now() - l.t > 240000 ? 'warn-t' : 'muted'), text: '  seen ' + ago(l.t) }));
+  }
+  function vOrders(v) {
+    var chips = h("div", { class: "tabs" });
+    [["active", "In progress"], ["done", "Completed"], ["cancelled", "Cancelled"], ["all", "All"]].forEach(function (f) { chips.append(h("button", { type: "button", "aria-selected": String(ordFilter === f[0]), onclick: function () { ordFilter = f[0]; draw(); } }, f[1])); });
+    v.append(chips);
+    var os = ordersArr().filter(function (o) { return ordFilter === "all" || (ordFilter === "active" ? ["requested", "accepted", "arrived", "ongoing"].indexOf(o.status) > -1 : o.status === ordFilter); });
+    var waitPay = ordersArr().filter(function (o) { return o.status === "requested" && o.pay && o.pay.status === "awaiting"; });
+    if (waitPay.length) v.append(h("div", { class: "card warn", id: "await-note" }, h("b", { text: waitPay.length + " order" + (waitPay.length > 1 ? "s" : "") + " waiting for payment" }), h("p", { class: "muted small", text: "Check your bank app. When the money has arrived with the order code as reference, tap \"I received the money\" on that order. Drivers only see an order after you do." })));
+    var refunds = ordersArr().filter(function (o) { return o.status === "cancelled" && o.pay && o.pay.status === "refunded" && !o.pay.refundPaid; });
+    if (refunds.length) v.append(h("div", { class: "card warn", id: "refund-card" }, h("h3", { text: "Refunds to send" }), h("p", { class: "muted small", text: "These customers paid and then cancelled. Send the money back by bank transfer, then tap Mark refunded." }),
+      refunds.map(function (o) { var u = D.users[o.riderId] || {}; return h("div", { class: "row between" }, h("span", { text: nameOf(o.riderId) + (u.phone ? " (" + u.phone + ")" : "") + "  " + money((o.pay && o.pay.amount) || o.fare) + "  code " + codeOf(o.id) }),
+        confirmBtn("Mark refunded", "good", function () { act(call("/orders/" + o.id, "PATCH", { pay: Object.assign({}, o.pay, { refundPaid: Date.now() }), updatedAt: Date.now() })); }, "rf" + o.id)); })));
+    if (!os.length) v.append(h("p", { class: "empty", text: "No orders here." }));
+    os.slice(0, 40).forEach(function (o) {
+      var live = ["requested", "accepted", "arrived", "ongoing"].indexOf(o.status) > -1;
+      v.append(h("div", { class: "card" },
+        h("div", { class: "row between" }, h("b", { text: o.type + " - " + o.status }), h("span", { class: "muted small", text: ago(o.createdAt) })),
+        h("div", { class: "kv" }, h("div", null, h("span", { text: "Rider  " }), nameOf(o.riderId)), h("div", null, h("span", { text: "Driver  " }), o.driverId ? nameOf(o.driverId) : "none yet"),
+          h("div", null, h("span", { text: "From  " }), o.pickup), h("div", null, h("span", { text: "To  " }), o.dropoff), h("div", null, h("span", { text: "Fare  " }), money(o.fare) + (o.km ? "  (" + o.km + " km)" : "") + (o.vType ? "  " + ({ bike: "Motorbike", car: "Car", haulage: "Truck" }[o.vType] || o.vType) : "")),
+          o.type === "shop" || o.type === "market" ? h("div", { class: "pre" }, h("span", { text: (o.type === "market" ? "Goods from " + (o.shopName || "shop") + "  " : "List  ") }), (o.list || "") + (o.receipt != null ? "\nReceipt: " + money(o.receipt) : "") + (o.type === "market" ? "\nGoods total: " + money(o.itemsTotal) + "  Order code: " + codeOf(o.id) + (o.shopPaid ? "  (shop paid)" : "") : "")) : null,
+          live && o.driverId ? [locLine(o, "driverLoc", "Driver location"), locLine(o, "riderLoc", "Customer location")] : null,
+          o.status === "ongoing" || o.status === "done" ? h("div", null, h("span", { text: "Confirmed  " }), "driver " + (o.driverConfirmed ? "yes" : "no") + ", customer " + (o.riderConfirmed ? "yes" : "no")) : null),
+        o.driverId ? h("div", { class: "list" }, TR[o.id] ? trailSvg(TR[o.id]) : h("button", { type: "button", class: "btn ghost", id: "tr-" + o.id, onclick: function () { call("/trails/" + o.id).then(function (d) { TR[o.id] = parseTrail(d); draw(); }).catch(function () { TR[o.id] = { rider: [], driver: [] }; draw(); }); } }, "View location trail")) : null,
+        (o.thumb || PV[o.id]) ? h("div", null,
+          PV[o.id] && PV[o.id] !== "none" ? h("div", { class: "row" }, ["item", "proof"].map(function (k) { return PV[o.id][k] ? h("div", null, h("div", { class: "muted small", text: k === "item" ? "Photo of the item" : "Proof of delivery" }), h("img", { src: PV[o.id][k], alt: k, style: "max-width:100%;width:240px;border-radius:10px" })) : null; }))
+            : h("div", { class: "row" }, o.thumb ? h("img", { src: o.thumb, alt: "item", style: "width:56px;height:56px;object-fit:cover;border-radius:8px" }) : null,
+              h("button", { type: "button", class: "btn ghost", onclick: function () { call("/photos/" + o.id, "GET").then(function (d) { PV[o.id] = d || "none"; draw(); }).catch(function () { PV[o.id] = "none"; draw(); }); } }, "View photos"))) : null,
+        o.status === "requested" && o.pay && o.pay.status === "awaiting" ? h("div", { class: "list" },
+          h("p", { class: o.pay.claimed ? "ok-note" : "muted small", text: "Waiting for " + money(o.pay.amount || (o.fare + (o.itemsTotal || 0))) + " with reference " + codeOf(o.id) + (o.pay.claimed ? ". The customer says they have paid (" + ago(o.pay.claimed) + ")." : ".") }),
+          confirmBtn("I received the money. Send this order to drivers", "good", function () {
+            var t = Date.now(), near = function (n) { return Math.round(n * 1000) / 1000; }, hint = /^(Pin on map|My location)/.test(o.pickup || "") ? "Near " + near(o.pLat) + ", " + near(o.pLng) : o.pickup;
+            var rd = { type: o.type, riderId: o.riderId, pickupHint: String(hint).slice(0, 80), pickupLat: near(o.pLat), pickupLng: near(o.pLng), km: o.km || 0, fare: o.fare, item: o.type === "delivery" ? (o.item || "") : "", size: o.size || "", vType: o.vType || "", list: (o.type === "shop" || o.type === "market") ? (o.list || "") : "", budget: o.budget || 0, createdAt: t };
+            if (o.thumb) rd.thumb = o.thumb;
+            if (o.type === "market") { rd.shopName = String(o.shopName || "").slice(0, 60); rd.itemsTotal = o.itemsTotal || 0; }
+            act(call("/orders/" + o.id, "PATCH", { pay: Object.assign({}, o.pay, { status: "held", confirmedAt: t }), updatedAt: t }).then(function () { return call("/openRequests/" + o.id, "PUT", rd); }));
+          }, "cp" + o.id)) : null,
+        o.status === "ongoing" ? h("div", { class: "row" }, confirmBtn("Mark completed and release funds", "", function () { var t = Date.now(); act(call("/orders/" + o.id, "PATCH", { status: "done", riderConfirmed: true, driverConfirmed: true, adminResolved: true, updatedAt: t, driverLoc: null, riderLoc: null, pay: o.pay && o.pay.status === "held" ? Object.assign({}, o.pay, { status: "released", releasedAt: t }) : (o.pay || { method: "transfer", status: "awaiting" }) })); }, "cr" + o.id)) : null,
+        live ? h("div", { class: "row" }, confirmBtn("Cancel this order", "danger", function () { act(call("/orders/" + o.id, "PATCH", Object.assign({ status: "cancelled", updatedAt: Date.now(), driverLoc: null, riderLoc: null }, o.pay && o.pay.status === "held" ? { pay: Object.assign({}, o.pay, { status: "refunded" }) } : {})).then(function () { return call("/openRequests/" + o.id, "DELETE"); })); }, "co" + o.id)) : null));
+    });
+  }
+
+  /* ---------- Shops: partner shops, their goods, orders to pass on, and what is owed ---------- */
+  var SF = { open: false, id: null, logo: undefined, goods: null, pid: null, pic: undefined };
+  function codeOf(id) { return String(id || "").replace(/[^a-z0-9]/gi, "").slice(-5).toUpperCase(); }
+  function waPhone(p) { var d = String(p || "").replace(/[^0-9]/g, ""); if (d.charAt(0) === "0") d = "234" + d.slice(1); return d; }
+  function shrinkImg(file, side, q) {
+    return new Promise(function (res, rej) {
+      var fr = new FileReader(); fr.onerror = function () { rej(new Error("read")); };
+      fr.onload = function () {
+        var im = new Image(); im.onerror = function () { rej(new Error("img")); };
+        im.onload = function () {
+          var k = Math.min(1, side / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.max(1, Math.round(im.width * k)); c.height = Math.max(1, Math.round(im.height * k));
+          c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL("image/jpeg", q));
+        };
+        im.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+  function fileIn(id, side, q, onPick) {
+    return h("input", { type: "file", id: id, accept: "image/*", onchange: function (e) {
+      var f = e.target.files && e.target.files[0]; if (!f) return;
+      shrinkImg(f, side, q).then(function (d) { onPick(d); flash("Picture ready. Tap Save."); }).catch(function () { flash("That picture could not be read."); });
+    } });
+  }
+  function vShops(v) {
+    var shops = Object.keys(D.shops || {}).map(function (k) { return Object.assign({ id: k }, D.shops[k]); }).sort(function (a, b) { return String(a.name).localeCompare(String(b.name)); });
+    v.addEventListener("input", function () { dirty = true; });
+    v.append(h("div", { class: "card hl" }, h("h3", { text: "Partner shops" }), h("p", { class: "muted small", text: "Add each supermarket or shop after you meet them. Customers see active shops under \"Shops\" in the app, with the advert and goods you enter here. Orders come to you in the list below. Pass each one to the shop on WhatsApp. Shop phone numbers and bank details stay private to this page." }),
+      h("div", { class: "row" }, h("button", { type: "button", class: "btn", id: "sh-add", onclick: function () { SF = { open: true, id: null, logo: undefined, goods: null, pid: null, pic: undefined }; dirty = false; draw(); } }, "Add a shop"))));
+    if (SF.open) v.append(shopForm());
+    /* orders to pass on */
+    var mk = ordersArr().filter(function (o) { return o.type === "market" && ["requested", "accepted", "arrived", "ongoing"].indexOf(o.status) > -1; });
+    var rc = h("div", { class: "card", id: "shop-orders" }, h("h3", { text: "Shop orders to pass on" }));
+    if (!mk.length) rc.append(h("p", { class: "empty", text: "No shop orders in progress." }));
+    mk.forEach(function (o) {
+      var sp = (D.sp || {})[o.shopId] || {}, lines = (o.items || []).map(function (i) { return i.q + " x " + i.n + " (" + money(i.p) + ")"; });
+      var bad = (o.items || []).some(function (i) { var pl = (D.prods || {})[o.shopId] || {}, ok = Object.keys(pl).some(function (k) { return pl[k].name === i.n && pl[k].price === i.p; }); return Object.keys(pl).length && !ok; });
+      var msg = "Blue Wolf order " + codeOf(o.id) + ":\n" + (lines.length ? lines.join("\n") : (o.list || "")) + "\nGoods total: " + money(o.itemsTotal) + "\nA Blue Wolf driver will collect it and show this order code. Please prepare it.";
+      rc.append(h("div", { class: "job card" }, h("div", { class: "row between" }, h("b", { text: (o.shopName || "Shop") + "  -  " + codeOf(o.id) }), h("span", { class: "pill gold", text: o.status })),
+        h("div", { class: "pre small", text: (lines.length ? lines.join("\n") : o.list || "") + "\nGoods " + money(o.itemsTotal) + ", delivery " + money(o.fare) + ", " + (o.pay && o.pay.status === "awaiting" ? "payment not confirmed yet" : "paid by bank transfer") }),
+        bad ? h("p", { class: "err", text: "Prices on this order do not match the shop's current prices. Check it before passing it on." }) : null,
+        sp.phone ? h("a", { class: "btn", href: "https://wa.me/" + waPhone(sp.phone) + "?text=" + encodeURIComponent(msg), target: "_blank", rel: "noopener" }, "Send to the shop on WhatsApp") : h("p", { class: "muted small", text: "No phone number saved for this shop." })));
+    });
+    v.append(rc);
+    /* owed */
+    var owed = {};
+    ordersArr().forEach(function (o) { if (o.type === "market" && o.status === "done" && !o.shopPaid && o.pay && o.pay.status === "released") { var r = owed[o.shopId] = owed[o.shopId] || { name: o.shopName, total: 0, ids: [] }; r.total += o.itemsTotal || 0; r.ids.push(o.id); } });
+    var oc = h("div", { class: "card", id: "owed-card" }, h("h3", { text: "Owed to shops" }), h("p", { class: "muted small", text: "Delivered orders. Pay the shop by bank transfer, then mark it paid." }));
+    if (!Object.keys(owed).length) oc.append(h("p", { class: "empty", text: "Nothing owed right now." }));
+    Object.keys(owed).forEach(function (sid) {
+      var r = owed[sid], sp = (D.sp || {})[sid] || {};
+      oc.append(h("div", { class: "row between" }, h("div", null, h("b", { text: r.name || sid }), h("div", { class: "muted small", text: r.ids.length + " order(s)" + (sp.bank ? "  -  " + sp.bank : "") })), h("b", { text: money(r.total) }),
+        confirmBtn("Mark paid", "good", function () { act(Promise.all(r.ids.map(function (id) { return call("/orders/" + id, "PATCH", { shopPaid: true }); }))); }, "owed" + sid)));
+    });
+    v.append(oc);
+    if (!shops.length) v.append(h("p", { class: "empty", text: "No shops yet. Tap \"Add a shop\"." }));
+    shops.forEach(function (sh) { v.append(shopCard(sh)); });
+  }
+  function shopForm() {
+    var sh = SF.id ? (D.shops[SF.id] || {}) : {}, sp = SF.id ? ((D.sp || {})[SF.id] || {}) : {};
+    var chk = function (id, label, on) { return h("label", { class: "chk", for: id }, h("input", { type: "checkbox", id: id, checked: !!on }), label); };
+    var logoPrev = h("img", { class: "logo-s", id: "sh-logo-prev", alt: "", hidden: !(sh.logo), src: sh.logo || "" });
+    return h("div", { class: "card hl", id: "shop-form" }, h("h3", { text: SF.id ? "Edit shop" : "New shop" }),
+      h("label", { for: "sh-name" }, "Shop name", h("input", { type: "text", id: "sh-name", maxlength: "60", value: sh.name || "" })),
+      h("label", { for: "sh-area" }, "Area or address", h("input", { type: "text", id: "sh-area", maxlength: "80", value: sh.area || "" })),
+      h("label", { for: "sh-ad" }, "Advert shown to customers", h("input", { type: "text", id: "sh-ad", maxlength: "160", value: sh.ad || "", placeholder: "e.g. Fresh bread daily. Free delivery bag." })),
+      h("label", { for: "sh-geo" }, "Shop position (latitude, longitude)", h("input", { type: "text", id: "sh-geo", maxlength: "40", value: sh.lat != null ? sh.lat + ", " + sh.lng : "", placeholder: "6.1983, 6.7326" })),
+      h("div", { class: "row" }, h("button", { type: "button", class: "btn ghost", id: "sh-here", onclick: function () {
+        if (!navigator.geolocation) { flash("This phone cannot share its location."); return; }
+        navigator.geolocation.getCurrentPosition(function (p) { $("sh-geo").value = (Math.round(p.coords.latitude * 1e5) / 1e5) + ", " + (Math.round(p.coords.longitude * 1e5) / 1e5); dirty = true; }, function () { flash("Could not get your location. Type it instead."); }, { enableHighAccuracy: true, timeout: 15000 });
+      } }, "Use my location now (stand at the shop)")),
+      h("p", { class: "muted small", text: "Tip: you can also long-press the shop on a map app and copy its coordinates." }),
+      h("label", { for: "sh-phone" }, "Shop WhatsApp number (private)", h("input", { type: "text", id: "sh-phone", maxlength: "20", value: sp.phone || "", placeholder: "0803 000 0000" })),
+      h("label", { for: "sh-bank" }, "Shop bank details for payouts (private)", h("input", { type: "text", id: "sh-bank", maxlength: "120", value: sp.bank || "", placeholder: "Bank, account number, account name" })),
+      h("label", { for: "sh-logo" }, "Logo (optional)", fileIn("sh-logo", 96, 0.6, function (d) { SF.logo = d; logoPrev.src = d; logoPrev.hidden = false; })), logoPrev,
+      chk("sh-open", "Open for orders now", sh.open !== false), chk("sh-active", "Show in the app", sh.active !== false), chk("sh-feat", "Featured (shown first)", sh.featured === true),
+      h("p", { class: "err", id: "sh-err", role: "alert" }),
+      h("div", { class: "row" }, h("button", { type: "button", class: "btn", id: "sh-save", onclick: saveShop }, "Save shop"), h("button", { type: "button", class: "btn ghost", onclick: function () { SF.open = false; dirty = false; draw(); } }, "Cancel")));
+  }
+  function saveShop() {
+    var err = $("sh-err"); err.textContent = "";
+    var name = $("sh-name").value.trim(), geo = /(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)/.exec($("sh-geo").value);
+    if (name.length < 2) { err.textContent = "Enter the shop name."; return; }
+    var lat = geo ? parseFloat(geo[1]) : NaN, lng = geo ? parseFloat(geo[2]) : NaN;
+    if (!geo || !(Math.abs(lat) <= 90) || !(Math.abs(lng) <= 180)) { err.textContent = "Enter the position as two numbers, like 6.1983, 6.7326."; return; }
+    var rec = { name: name, area: $("sh-area").value.trim(), ad: $("sh-ad").value.trim(), lat: lat, lng: lng, open: $("sh-open").checked, active: $("sh-active").checked, featured: $("sh-feat").checked };
+    if (SF.logo !== undefined) rec.logo = SF.logo;
+    var priv = { phone: $("sh-phone").value.trim(), bank: $("sh-bank").value.trim() }, id = SF.id;
+    SF.open = false; dirty = false;
+    act(id ? call("/shops/" + id, "PATCH", rec).then(function () { return call("/shopsPrivate/" + id, "PATCH", priv); })
+      : call("/shops", "POST", Object.assign({ createdAt: Date.now() }, rec)).then(function (r) { return call("/shopsPrivate/" + r.name, "PUT", priv); }));
+  }
+  function shopCard(sh) {
+    var prods = (D.prods || {})[sh.id] || {}, keys = Object.keys(prods), openG = SF.goods === sh.id;
+    var card = h("div", { class: "card", "data-shop": sh.id },
+      h("div", { class: "row between" }, h("div", { class: "row" }, sh.logo ? h("img", { class: "logo-s", src: sh.logo, alt: "" }) : null, h("div", null, h("b", { text: sh.name }), h("div", { class: "muted small", text: sh.area || "" }))),
+        h("div", { class: "row" }, h("span", { class: "pill " + (sh.active === false ? "bad" : "ok"), text: sh.active === false ? "hidden" : "listed" }), h("span", { class: "pill " + (sh.open === false ? "bad" : "ok"), text: sh.open === false ? "closed" : "open" }), sh.featured ? h("span", { class: "pill gold", text: "featured" }) : null)),
+      sh.ad ? h("p", { class: "small", text: sh.ad }) : null,
+      h("p", { class: "muted small", text: keys.length + " item(s) for sale" }),
+      h("div", { class: "row" },
+        h("button", { type: "button", class: "btn ghost", onclick: function () { SF = { open: true, id: sh.id, logo: undefined, goods: null, pid: null, pic: undefined }; dirty = false; draw(); window.scrollTo(0, 0); } }, "Edit"),
+        h("button", { type: "button", class: "btn ghost", onclick: function () { SF.goods = openG ? null : sh.id; SF.pid = null; SF.pic = undefined; dirty = false; if (!openG) call("/productPics/" + sh.id).then(function (d) { D.pics[sh.id] = d || {}; draw(); }).catch(function () { draw(); }); else draw(); } }, openG ? "Close goods" : "Goods"),
+        h("button", { type: "button", class: "btn ghost", onclick: function () { act(call("/shops/" + sh.id, "PATCH", { open: sh.open === false })); } }, sh.open === false ? "Mark open" : "Mark closed"),
+        confirmBtn("Delete shop", "danger", function () { act(Promise.all(["/shops/", "/shopsPrivate/", "/products/", "/productPics/"].map(function (p) { return call(p + sh.id, "DELETE"); }))); }, "ds" + sh.id)));
+    if (openG) card.append(goodsBlock(sh, prods, keys));
+    return card;
+  }
+  function goodsBlock(sh, prods, keys) {
+    var box = h("div", { class: "list" }, h("h3", { text: "Goods" }));
+    box.addEventListener("input", function () { dirty = true; });
+    if (!keys.length) box.append(h("p", { class: "empty", text: "No goods yet." }));
+    keys.forEach(function (k) {
+      var p = prods[k], pic = (D.pics[sh.id] || {})[k];
+      box.append(h("div", { class: "row between", "data-prod": k }, h("div", { class: "row" }, pic ? h("img", { class: "logo-s", src: pic, alt: "" }) : null, h("div", null, h("b", { text: p.name }), h("div", { class: "muted small", text: money(p.price) + (p.unit ? " / " + p.unit : "") + (p.inStock === false ? "  -  out of stock" : "") }))),
+        h("div", { class: "row" },
+          h("button", { type: "button", class: "btn ghost", onclick: function () { SF.pid = k; SF.pic = undefined; dirty = false; draw(); } }, "Edit"),
+          h("button", { type: "button", class: "btn ghost", onclick: function () { act(call("/products/" + sh.id + "/" + k, "PATCH", { inStock: p.inStock === false })); } }, p.inStock === false ? "In stock" : "Out of stock"),
+          confirmBtn("Remove", "danger", function () { act(Promise.all([call("/products/" + sh.id + "/" + k, "DELETE"), call("/productPics/" + sh.id + "/" + k, "DELETE")])); }, "dp" + k))));
+    });
+    var cur = SF.pid ? prods[SF.pid] || {} : {};
+    box.append(h("div", { class: "card hl", id: "prod-form" }, h("b", { text: SF.pid ? "Edit item" : "Add an item" }),
+      h("label", { for: "pr-name" }, "Item name", h("input", { type: "text", id: "pr-name", maxlength: "60", value: cur.name || "", placeholder: "e.g. Rice, 5 kg" })),
+      h("label", { for: "pr-price" }, "Price (NGN)", h("input", { type: "text", id: "pr-price", inputmode: "numeric", maxlength: "8", value: cur.price != null ? String(cur.price) : "" })),
+      h("label", { for: "pr-unit" }, "Unit (optional)", h("input", { type: "text", id: "pr-unit", maxlength: "20", value: cur.unit || "", placeholder: "e.g. bag, litre" })),
+      h("label", { for: "pr-pic" }, "Picture (optional)", fileIn("pr-pic", 160, 0.55, function (d) { SF.pic = d; })),
+      h("p", { class: "err", id: "pr-err", role: "alert" }),
+      h("div", { class: "row" }, h("button", { type: "button", class: "btn", id: "pr-save", onclick: function () {
+        var name = $("pr-name").value.trim(), price = parseInt(String($("pr-price").value).replace(/[^0-9]/g, ""), 10) || 0, e = $("pr-err"); e.textContent = "";
+        if (!name) { e.textContent = "Enter the item name."; return; }
+        if (!(price > 0 && price <= 5000000)) { e.textContent = "Enter the price in naira."; return; }
+        var rec = { name: name, price: price, unit: $("pr-unit").value.trim(), inStock: true }, pid = SF.pid, pic = SF.pic;
+        if (pid && prods[pid]) rec.inStock = prods[pid].inStock !== false;
+        dirty = false; SF.pid = null; SF.pic = undefined;
+        act((pid ? call("/products/" + sh.id + "/" + pid, "PATCH", rec).then(function () { return pid; }) : call("/products/" + sh.id, "POST", rec).then(function (r) { return r.name; }))
+          .then(function (k) { if (pic) { D.pics[sh.id] = D.pics[sh.id] || {}; D.pics[sh.id][k] = pic; return call("/productPics/" + sh.id + "/" + k, "PUT", pic); } }));
+      } }, SF.pid ? "Save item" : "Add item"), SF.pid ? h("button", { type: "button", class: "btn ghost", onclick: function () { SF.pid = null; dirty = false; draw(); } }, "Cancel") : null)));
+    return box;
+  }
+  function vAlerts(v) {
+    var al = alerts();
+    if (!al.length) v.append(h("p", { class: "empty", text: "No alerts. Nothing suspicious found right now." }));
+    al.forEach(function (a) {
+      var u = a.uid && D.users[a.uid];
+      v.append(h("div", { class: "card " + (a.sev === "high" ? "warn" : "") }, h("div", { class: "row between" }, h("span", { class: "pill " + (a.sev === "high" ? "bad" : a.sev === "med" ? "gold" : ""), text: a.sev }), null), h("p", { text: a.text }),
+        h("div", { class: "row" },
+          u ? [wa(u.phone, "WhatsApp"), u.status !== "suspended" ? confirmBtn("Suspend account", "danger", function () { act(call("/users/" + a.uid, "PATCH", { status: "suspended" })); }, "as" + a.uid + a.text) : h("span", { class: "pill bad", text: "suspended" })] : null,
+          a.stale ? confirmBtn("Clear them", "danger", function () { act(Promise.all(a.stale.map(function (k) { return call("/openRequests/" + k, "DELETE"); }))); }, "st") : null)));
+    });
+  }
+})();
+</script>
