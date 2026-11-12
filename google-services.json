@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "553112946731",
+    "firebase_url": "https://blue-wolf-1d49b-default-rtdb.firebaseio.com",
+    "project_id": "blue-wolf-1d49b",
+    "storage_bucket": "blue-wolf-1d49b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:553112946731:android:1d3f8ce02bd3797863826e",
+        "android_client_info": {
+          "package_name": "ng.bluewolf.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEh8LoV5pg-amxNf6dn20vDuLpRj55xpk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
